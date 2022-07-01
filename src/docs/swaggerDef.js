@@ -8,7 +8,7 @@ const swaggerDef = {
     version,
     license: {
       name: 'MIT',
-      url: 'kendam/node-express-boilerplate-sequelize/blob/master/LICENSE',
+      url: 'https://github.com/emmiiorji/node-express-boilerplate/blob/master/LICENSE',
     },
   },
   servers: [
