@@ -4730,7 +4730,7 @@ named-placeholders@^1.1.2:
   dependencies:
     lru-cache "^4.1.3"
 
-nanoid@*:
+nanoid@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/nanoid/-/nanoid-4.0.0.tgz"
   integrity sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==
@@ -5961,6 +5961,11 @@ seq-queue@^0.0.5:
   version "0.0.5"
   resolved "https://registry.npmjs.org/seq-queue/-/seq-queue-0.0.5.tgz"
   integrity sha512-hr3Wtp/GZIc/6DAGPDcV4/9WoZhjrkXsi5B/07QgX8tsdc6ilr7BFM6PM6rbdAX1kFSDYeZGLipIZZKyQP0O5Q==
+
+sequelize-paginate@*:
+  version "1.1.6"
+  resolved "https://registry.npmjs.org/sequelize-paginate/-/sequelize-paginate-1.1.6.tgz"
+  integrity sha512-PQngK3AFn0WZW09VveD0nf2cfHSKZMbdgfQTDUVRVA8qgidDc9iAwUYb64SVSBlMjXoAhCpewqNdyiSOOF7PvQ==
 
 sequelize-pool@^7.1.0:
   version "7.1.0"
