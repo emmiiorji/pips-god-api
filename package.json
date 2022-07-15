@@ -68,6 +68,7 @@
     "nodemailer": "^6.3.1",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
+    "paystack": "^2.0.1",
     "pm2": "^5.1.0",
     "sequelize": "^6.25.3",
     "sequelize-paginate": "^1.1.6",
