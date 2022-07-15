@@ -5245,7 +5245,7 @@ pause@0.0.1:
   resolved "https://registry.npmjs.org/pause/-/pause-0.0.1.tgz"
   integrity sha1-HUCLP9t2kjuVQ9lvtMnf1TXZy10=
 
-paystack@*:
+paystack@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/paystack/-/paystack-2.0.1.tgz"
   integrity sha512-reVONV7ZUMln/iWeM60n0BbogF3/zFWmUrqbKYVNzEAv+p9TcWDCHfNZ2mBGXzIXhyTsNXWwf4wNcXe28btAHw==

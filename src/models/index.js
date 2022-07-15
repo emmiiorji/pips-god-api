@@ -30,6 +30,7 @@ db.Sequelize = Sequelize;
 db.users = require('./user.model')(sequelizeInstance, Sequelize);
 db.tokens = require('./token.model')(sequelizeInstance, Sequelize);
 db.subscriptions = require('./subscription.model')(sequelizeInstance, Sequelize);
+db.transactions = require('./transaction.model')(sequelizeInstance, Sequelize);
 
 // relationships for models
 
