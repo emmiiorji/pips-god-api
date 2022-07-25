@@ -2,7 +2,13 @@ const sequelizePaginate = require('sequelize-paginate');
 const validator = require('validator');
 
 module.exports = (sequelize, dataType) => {
-  const Transaction = sequelize.define('transaction', {
+  const transaction = sequelize.define('transaction', {
+    id: {
+      type: dataType.STRING,
+      // eslint-disable-next-line global-require
+      defaultValue: require('nanoid').nanoid(),
+      primaryKey: true,
+    },
     status: {
       type: dataType.STRING,
       allowNull: false,
@@ -34,8 +40,15 @@ module.exports = (sequelize, dataType) => {
       trim: true,
       lowercase: true,
     },
+    currency: {
+      type: dataType.STRING,
+      defaultValue: 'NGN',
+    },
+    amount: {
+      type: dataType.INTEGER,
+    },
   });
 
-  sequelizePaginate.paginate(Transaction);
-  return Transaction;
+  sequelizePaginate.paginate(transaction);
+  return transaction;
 };
