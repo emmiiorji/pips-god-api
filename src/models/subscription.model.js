@@ -1,16 +1,8 @@
-const { dateUnits } = require('../config/dateUnits');
+const sequelizePaginate = require('sequelize-paginate');
 
-module.exports = (sequelize, dataType) => {
-  const subscription = sequelize.define('subscription', {
-    validity: {
-      type: dataType.INTEGER,
-      defaultValue: 30,
-    },
-    validityUnit: {
-      type: dataType.ENUM(...Object.values(dateUnits)),
-      defaultValue: dateUnits.DAYS,
-    },
-  });
+module.exports = (sequelize) => {
+  const subscription = sequelize.define('subscription', {});
 
+  sequelizePaginate.paginate(subscription);
   return subscription;
 };
