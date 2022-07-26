@@ -1,4 +1,5 @@
 const validator = require('validator');
+const sequelizePaginate = require('sequelize-paginate');
 
 module.exports = (sequelize, dataType) => {
   const user = sequelize.define('user', {
@@ -40,5 +41,6 @@ module.exports = (sequelize, dataType) => {
     },
   });
 
+  sequelizePaginate.paginate(user);
   return user;
 };
