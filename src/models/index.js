@@ -31,6 +31,12 @@ db.users = require('./user.model')(sequelizeInstance, Sequelize);
 db.tokens = require('./token.model')(sequelizeInstance, Sequelize);
 db.subscriptions = require('./subscription.model')(sequelizeInstance, Sequelize);
 db.transactions = require('./transaction.model')(sequelizeInstance, Sequelize);
+db.subscription_plans = require('./subscription_plan.model')(sequelizeInstance, Sequelize);
+db.subscriptions = require('./subscription.model')(sequelizeInstance, Sequelize);
+db.roles = require('./role.model')(sequelizeInstance, Sequelize);
+db.user_courses = require('./user_course.model')(sequelizeInstance, Sequelize);
+db.permissions = require('./permission.model')(sequelizeInstance, Sequelize);
+db.courses = require('./course.model')(sequelizeInstance, Sequelize);
 
 // relationships for models
 
