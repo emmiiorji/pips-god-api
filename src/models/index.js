@@ -46,6 +46,9 @@ db.courses = require('./course.model')(sequelizeInstance, Sequelize);
 // db.User.hasMany(db.Role);
 // db.Role.belongsTo(db.User);
 
+// user to token 1-m
+db.users.hasMany(db.tokens);
+db.tokens.belongsTo(db.users);
 module.exports = {
   db,
 };
