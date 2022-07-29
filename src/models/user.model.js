@@ -3,6 +3,12 @@ const sequelizePaginate = require('sequelize-paginate');
 
 module.exports = (sequelize, dataType) => {
   const user = sequelize.define('user', {
+    id: {
+      type: dataType.STRING,
+      // eslint-disable-next-line global-require
+      defaultValue: require('nanoid').nanoid(),
+      primaryKey: true,
+    },
     firstName: {
       type: dataType.STRING,
       allowNull: false,
