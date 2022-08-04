@@ -22,6 +22,7 @@ module.exports = (sequelize, dataType) => {
     },
     blacklisted: {
       type: dataType.BOOLEAN,
+      default: false,
     },
   });
 
