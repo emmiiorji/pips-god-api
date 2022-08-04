@@ -62,6 +62,10 @@ db.roles.belongsToMany(db.users, { through: 'user_roles' });
 db.users.belongsToMany(db.courses, { through: db.user_courses });
 db.courses.belongsToMany(db.users, { through: db.user_courses });
 
+// user to subscription plan m-m
+db.users.belongsToMany(db.subscription_plans, { through: db.subscriptions });
+db.subscription_plans.belongsToMany(db.users, { through: db.subscriptions });
+
 module.exports = {
   db,
 };
