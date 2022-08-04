@@ -54,6 +54,10 @@ db.tokens.belongsTo(db.users);
 db.users.belongsToMany(db.permissions, { through: 'role_permissions' });
 db.permissions.belongsToMany(db.users, { through: 'role_permissions' });
 
+// user to role m-m
+db.users.belongsToMany(db.roles, { through: 'user_roles' });
+db.roles.belongsToMany(db.users, { through: 'user_roles' });
+
 module.exports = {
   db,
 };
