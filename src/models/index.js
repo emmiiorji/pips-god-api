@@ -58,6 +58,10 @@ db.permissions.belongsToMany(db.users, { through: 'role_permissions' });
 db.users.belongsToMany(db.roles, { through: 'user_roles' });
 db.roles.belongsToMany(db.users, { through: 'user_roles' });
 
+// user to course m-m
+db.users.belongsToMany(db.courses, { through: db.user_courses });
+db.courses.belongsToMany(db.users, { through: db.user_courses });
+
 module.exports = {
   db,
 };
