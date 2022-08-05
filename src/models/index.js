@@ -70,6 +70,10 @@ db.subscription_plans.belongsToMany(db.users, { through: db.subscriptions });
 db.user_courses.belongsTo(db.subscriptions, { allowNull: false });
 db.subscriptions.hasMany(db.user_courses);
 
+// subscription to transaction 1-1
+db.subscriptions.hasOne(db.transactions);
+db.transactions.belongsTo(db.subscriptions);
+
 module.exports = {
   db,
 };
