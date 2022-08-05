@@ -36,6 +36,29 @@ const initializeTransaction = async (transactionBody) => {
     }
   );
 };
+
+/**
+ * Verify a transaction
+ * @param {Object} transactionBody
+ * @returns {Promise<User>}
+ */
+const verifyTransaction = async (reference) => {
+  const transaction = await db.transactions.findOne({ where: { reference } });
+  if (!transaction) throw new ApiError(httpStatus.NOT_FOUND, 'Transaction not found');
+  try {
+    const response = await paystack.transaction.verify(reference);
+    if (transaction.status !== response.data.status) {
+      transaction.update({ status: response.data.status });
+    }
+    // Record the transaction a subscription
+    return { status: response.data.status };
+  } catch (error) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'An error occurred');
+    // console.error(error);
+  }
+};
+
 module.exports = {
   initializeTransaction,
+  verifyTransaction,
 };
