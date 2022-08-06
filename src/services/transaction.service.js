@@ -74,8 +74,21 @@ const queryTransactions = async (filter, options) => {
   return transactions;
 };
 
+/**
+ * Get user by id
+ * @param {ObjectId} id
+ * @returns {Promise<User>}
+ */
+const getTransactionByReference = async (reference) => {
+  const transaction = db.transactions.findOne({ where: { reference } });
+
+  if (!transaction) throw new ApiError(httpStatus.NOT_FOUND);
+  return transaction;
+};
+
 module.exports = {
   initializeTransaction,
   verifyTransaction,
   queryTransactions,
+  getTransactionByReference,
 };
