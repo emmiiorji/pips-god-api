@@ -6,7 +6,7 @@ const { db } = require('../models');
 /**
  * Initialize a transaction
  * @param {Object} transactionBody
- * @returns {Promise<User>}
+ * @returns {Promise<Object>}
  */
 const initializeTransaction = async (transactionBody) => {
   const subscriptionPlan = await db.subscriptionPlan.findOne({
@@ -40,7 +40,7 @@ const initializeTransaction = async (transactionBody) => {
 /**
  * Verify a transaction
  * @param {Object} transactionBody
- * @returns {Promise<User>}
+ * @returns {Promise<Object>}
  */
 const verifyTransaction = async (reference) => {
   const transaction = await db.transactions.findOne({ where: { reference } });
@@ -75,9 +75,9 @@ const queryTransactions = async (filter, options) => {
 };
 
 /**
- * Get user by id
- * @param {ObjectId} id
- * @returns {Promise<User>}
+ * Get transaction by reference
+ * @param {string} reference
+ * @returns {Promise<Transaction>}
  */
 const getTransactionByReference = async (reference) => {
   const transaction = db.transactions.findOne({ where: { reference } });
