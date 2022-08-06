@@ -5,7 +5,8 @@ const { transactionStatuses } = require('../config/transactionStatus');
 const initializeTransaction = {
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    subscriptionPlanId: Joi.number().integer().required(),
+    subscriptionPlanName: Joi.number().integer().required(),
+    currency: Joi.string(),
   }),
 };
 
@@ -24,7 +25,9 @@ const getTransactions = {
 };
 
 const verifyTransaction = {
-  reference: Joi.string(),
+  param: Joi.object().keys({
+    reference: Joi.string().required(),
+  }),
 };
 
 module.exports = {
