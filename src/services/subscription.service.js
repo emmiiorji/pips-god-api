@@ -1,3 +1,5 @@
+const httpStatus = require('http-status');
+const ApiError = require('../utils/ApiError');
 const { db } = require('../models');
 
 /**
@@ -53,8 +55,20 @@ const getSubscriptionsByPlan = async (name) => {
   });
 };
 
+/**
+ * Get subscription by transactionId
+ * @param {string} subscriptionPlan
+ * @returns {Promise<Subscription>}
+ */
+const getSubscriptionByTransactionId = async (transactionId) => {
+  const subscription = db.transactions.findOne({ where: { transactionId } });
+  if (!subscription) throw new ApiError(httpStatus.NOT_FOUND, 'Subscription not found');
+  return subscription;
+};
+
 module.exports = {
   querySubscriptions,
   getUserSubscriptions,
   getSubscriptionsByPlan,
+  getSubscriptionByTransactionId,
 };
