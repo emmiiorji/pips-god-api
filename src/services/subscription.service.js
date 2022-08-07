@@ -23,6 +23,22 @@ const querySubscriptions = async (filter, options) => {
   return subscriptions;
 };
 
+/**
+ * Get Subscriptions made by userId
+ * @param {ObjectId} id
+ * @returns {Promise<Subscription>}
+ */
+const getUserSubscriptions = async (userId) => {
+  return db.subscriptions.paginate({
+    where: { userId },
+    include: {
+      model: db.transactions,
+      attributes: ['id', 'status', 'email', 'reference', 'amount', 'currency'], // only return listed attributes
+    },
+  });
+};
+
 module.exports = {
   querySubscriptions,
+  getUserSubscriptions,
 };
