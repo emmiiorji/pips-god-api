@@ -58,7 +58,24 @@ const verifyTransaction = async (reference) => {
   }
 };
 
+/**
+ * Query for transactions. Can be performed only by admin
+ * @param {Object} filter - Mongo filter
+ * @param {Object} options - Query options
+ * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
+ * @param {number} [options.limit] - Maximum number of results per page (default = 10)
+ * @param {number} [options.page] - Current page (default = 1)
+ * @returns {Promise<QueryResult>}
+ */
+const queryTransactions = async (filter, options) => {
+  // Todo
+  // Change options.sortBy of format: sortField:(desc|asc) to options.order of format: [['sortField', 'DESC'|'ASC']]
+  const transactions = await db.transactions.paginate({ ...options });
+  return transactions;
+};
+
 module.exports = {
   initializeTransaction,
   verifyTransaction,
+  queryTransactions,
 };
