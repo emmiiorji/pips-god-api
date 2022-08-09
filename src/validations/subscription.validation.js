@@ -11,6 +11,18 @@ const createSubscription = {
   }),
 };
 
+const querySubscriptions = {
+  query: Joi.object().keys({
+    transactionId: Joi.string(),
+    userId: Joi.string(),
+    subscriptionPlanId: Joi.string(),
+    sortBy: Joi.string(),
+    limit: Joi.number().integer(),
+    page: Joi.number().integer(),
+  }),
+};
+
 module.exports = {
   createSubscription,
+  querySubscriptions,
 };
