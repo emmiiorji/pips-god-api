@@ -30,8 +30,15 @@ const verifyTransaction = {
   }),
 };
 
+const getTransactionByReference = {
+  param: Joi.object().keys({
+    reference: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   initializeTransaction,
   getTransactions,
   verifyTransaction,
+  getTransactionByReference,
 };
