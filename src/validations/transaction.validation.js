@@ -5,8 +5,8 @@ const { transactionStatuses } = require('../config/transactionStatus');
 const initializeTransaction = {
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    subscriptionPlanName: Joi.number().integer().required(),
-    currency: Joi.string(),
+    subscriptionPlanName: Joi.string().required(),
+    // currency: Joi.string(),
   }),
 };
 
@@ -19,6 +19,7 @@ const getTransactions = {
     reference: Joi.string(),
     accessCode: Joi.string(),
     sortBy: Joi.string(),
+    direction: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
   }),
