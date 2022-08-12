@@ -22,7 +22,14 @@ const querySubscriptions = {
   }),
 };
 
+const getUserSubscriptions = {
+  params: Joi.object().keys({
+    userId: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   createSubscription,
   querySubscriptions,
+  getUserSubscriptions,
 };
