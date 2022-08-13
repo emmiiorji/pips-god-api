@@ -25,6 +25,7 @@ const envVarsSchema = Joi.object()
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
     PAYSTACK_SECRET_KEY: Joi.string().description('the paystack secret key'),
     PAYSTACK_PUBLIC_KEY: Joi.string().description('the paystack public key'),
+    CLIENT_BASE_URL: Joi.string().description('the client base url'),
   })
   .unknown();
 
@@ -66,5 +67,8 @@ module.exports = {
   paystack: {
     secretKey: envVars.PAYSTACK_SECRET_KEY,
     publicKey: envVars.PAYSTACK_PUBLIC_KEY,
+  },
+  client: {
+    baseUrl: envVars.CLIENT_BASE_URL,
   },
 };
