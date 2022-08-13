@@ -3,6 +3,7 @@ const transactionStatuses = {
   FAILED: 'failed',
   ABANDONED: 'abandoned',
   ERROR: 'error',
+  INITIATED: 'initiated',
 };
 
 module.exports = {
