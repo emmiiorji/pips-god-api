@@ -4,7 +4,7 @@ const config = require('../config/config');
 const swaggerDef = {
   openapi: '3.0.0',
   info: {
-    title: 'node-express-boilerplate-sequelize API documentation',
+    title: 'Pips god Application API documentation',
     version,
     license: {
       name: 'MIT',
