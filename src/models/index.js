@@ -48,7 +48,7 @@ db.courses = require('./course.model')(sequelizeInstance, Sequelize);
 
 // user to token 1-m
 db.users.hasMany(db.tokens);
-db.tokens.belongsTo(db.users);
+db.tokens.belongsTo(db.users, { allowNull: false });
 
 // role to permission
 db.users.belongsToMany(db.permissions, { through: 'role_permissions' });

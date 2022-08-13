@@ -8,10 +8,6 @@ module.exports = (sequelize, dataType) => {
       trim: true,
       index: true,
     },
-    user: {
-      type: dataType.INTEGER,
-      allowNull: false,
-    },
     type: {
       type: dataType.ENUM(tokenTypes.REFRESH, tokenTypes.RESET_PASSWORD, tokenTypes.VERIFY_EMAIL),
       allowNull: false,
