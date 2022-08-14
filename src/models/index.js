@@ -71,8 +71,8 @@ db.user_courses.belongsTo(db.subscriptions, { allowNull: false });
 db.subscriptions.hasMany(db.user_courses);
 
 // subscription to transaction 1-1
-db.subscriptions.hasOne(db.transactions);
-db.transactions.belongsTo(db.subscriptions);
+db.subscriptions.belongsTo(db.transactions);
+db.transactions.hasOne(db.subscriptions);
 
 module.exports = {
   db,
