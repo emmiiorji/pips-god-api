@@ -1,12 +1,13 @@
 const validator = require('validator');
 const sequelizePaginate = require('sequelize-paginate');
+const { nanoid } = require('nanoid');
 
 module.exports = (sequelize, dataType) => {
   const user = sequelize.define('user', {
     id: {
       type: dataType.STRING,
       // eslint-disable-next-line global-require
-      defaultValue: require('nanoid').nanoid(),
+      defaultValue: () => nanoid(),
       primaryKey: true,
     },
     firstName: {

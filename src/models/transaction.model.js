@@ -1,12 +1,13 @@
 const sequelizePaginate = require('sequelize-paginate');
 const validator = require('validator');
+const { nanoid } = require('nanoid');
 
 module.exports = (sequelize, dataType) => {
   const transaction = sequelize.define('transaction', {
     id: {
       type: dataType.STRING,
       // eslint-disable-next-line global-require
-      defaultValue: require('nanoid').nanoid(),
+      defaultValue: () => nanoid(),
       primaryKey: true,
     },
     status: {
@@ -42,7 +43,7 @@ module.exports = (sequelize, dataType) => {
     },
     currency: {
       type: dataType.STRING,
-      defaultValue: 'NGN',
+      defaultValue: 'USD',
     },
     amount: {
       type: dataType.INTEGER,
