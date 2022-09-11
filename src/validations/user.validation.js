@@ -8,8 +8,8 @@ const createUser = {
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
     middleName: Joi.string(),
-    role: Joi.string().required().valid('user', 'admin'),
-    subscriptionId: Joi.string().required(),
+    role: Joi.string(),
+    transactionReference: Joi.string().required(),
   }),
 };
 
