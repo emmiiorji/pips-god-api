@@ -43,8 +43,9 @@ db.courses = require('./course.model')(sequelizeInstance, Sequelize);
 //= ==============================
 // Define all relationships here below
 //= ==============================
-// db.User.hasMany(db.Role);
-// db.Role.belongsTo(db.User);
+// user to role m-m
+db.users.belongsToMany(db.roles, { through: 'user_roles' });
+db.roles.belongsToMany(db.users, { through: 'user_roles' });
 
 // user to token 1-m
 db.users.hasMany(db.tokens);
