@@ -83,6 +83,24 @@ components:
         access_code: 6wz1fgwoybbvswx
         amount: 100000
         currency: NGN
+    
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        body:
+          type: text
+          format: email
+        userId:
+          type: string
+      example:
+        id: 5ebac534954b54139806c112
+        title: Welcome
+        body: username@email.com
+        userId: 5ebac534954b54139806c112
 
     AuthTokens:
       type: object
