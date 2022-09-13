@@ -3,6 +3,7 @@ const paystack = require('paystack')(require('../config/config').paystack.secret
 const { client } = require('../config/config');
 const ApiError = require('../utils/ApiError');
 const { db } = require('../models');
+const { transactionStatuses } = require('../config/transactionStatus');
 
 /**
  * Initialize a transaction
@@ -50,7 +51,9 @@ const verifyTransaction = async (reference) => {
   if (!transaction) throw new ApiError(httpStatus.NOT_FOUND, 'Transaction not found');
   try {
     const response = await paystack.transaction.verify(reference);
-    if (transaction.status !== response.data.status) {
+    if (!(response.data.amount === transaction.amount) && response.data.status === 'success') {
+      transaction.status = transactionStatuses.PARTIALLY_PAID;
+    } else if (transaction.status !== response.data.status) {
       transaction.update({ status: response.data.status });
     }
 
