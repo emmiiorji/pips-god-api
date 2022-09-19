@@ -1,8 +1,9 @@
 const httpStatus = require('http-status');
-const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
 const { db } = require('../models');
 const logger = require('../config/logger');
+const { bcrypt } = require('../config/config');
+const pick = require('../utils/pick');
 
 /**
  * Check if email is taken
@@ -13,6 +14,27 @@ const isEmailTaken = async function (email) {
   const user = await db.users.findOne({ where: { email } });
   logger.info(user);
   return !!user;
+};
+
+const removePassword = (user) => {
+  if (typeof user === 'object' && user !== null && !Array.isArray(user)) {
+    return pick(
+      user.dataValues,
+      Object.keys(user.dataValues).filter((key) => key !== 'password')
+    );
+  }
+  return user;
+};
+
+const filterUser = (user) => {
+  const newUser = {
+    ...user,
+    dataValues: {
+      ...user.dataValues,
+      roles: user.roles.map((role) => pick(role.dataValues, ['name'])),
+    },
+  };
+  return removePassword(newUser);
 };
 
 /**
@@ -32,12 +54,36 @@ const isPasswordMatch = async function (password, user) {
  * @returns {Promise<User>}
  */
 const createUser = async (userBody) => {
+  const { reference, role, ...user } = userBody;
+
+  // TODO: If role is admin, check if user is admin or superadmin
+
+  const transaction = await db.transactions.findOne({ where: { reference } });
+  if (!transaction) throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Invalid transaction reference');
+
+  if (transaction.status !== 'success') throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Transaction was not successful');
+
   if (await isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
   // eslint-disable-next-line no-param-reassign
-  userBody.password = bcrypt.hashSync(userBody.password, 8);
-  return db.users.create(userBody);
+  user.password = bcrypt.hashSync(user.password, bcrypt.salt);
+
+  // Use a transaction to create the user and subscription
+  const sequelizeTransaction = await db.sequelize.transaction();
+  const userCreated = await db.users.create(user, { transaction: sequelizeTransaction });
+  await userCreated.addRole(role || 'user', { transaction: sequelizeTransaction });
+  await db.subscriptions.create(
+    {
+      userId: userCreated.id,
+      transactionId: transaction.id,
+      subscriptionPlanId: transaction.subscriptionPlanId,
+    },
+    { transaction: sequelizeTransaction }
+  );
+
+  await sequelizeTransaction.commit();
+  return filterUser(userCreated);
 };
 
 /**
@@ -50,8 +96,19 @@ const createUser = async (userBody) => {
  * @returns {Promise<QueryResult>}
  */
 const queryUsers = async (filter, options) => {
-  const users = await db.users.paginate(filter, options);
-  return users;
+  if (options.sortBy !== undefined) {
+    // eslint-disable-next-line no-param-reassign
+    options.order = [[options.sortBy, options.direction]];
+  }
+  const users = await db.users.paginate({
+    where: filter,
+    ...options,
+    include: db.roles,
+  }); // .paginate(filter, options);
+  return {
+    ...users,
+    docs: users.docs.map((user) => filterUser(user)),
+  };
 };
 
 /**
@@ -60,7 +117,8 @@ const queryUsers = async (filter, options) => {
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  return db.users.findById(id);
+  const user = await db.users.findByPk(id, { include: db.roles });
+  return filterUser(user);
 };
 
 /**
@@ -69,7 +127,7 @@ const getUserById = async (id) => {
  * @returns {Promise<User>}
  */
 const getUserByEmail = async (email) => {
-  return db.users.findOne({ where: { email } });
+  return filterUser(await db.users.findOne({ where: { email }, include: db.roles }));
 };
 
 /**
