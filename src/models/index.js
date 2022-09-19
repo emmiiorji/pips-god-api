@@ -37,6 +37,7 @@ db.roles = require('./role.model')(sequelizeInstance, Sequelize);
 db.user_courses = require('./user_course.model')(sequelizeInstance, Sequelize);
 db.permissions = require('./permission.model')(sequelizeInstance, Sequelize);
 db.courses = require('./course.model')(sequelizeInstance, Sequelize);
+db.notifications = require('./notification.model')(sequelizeInstance, Sequelize);
 
 // relationships for models
 
@@ -74,6 +75,10 @@ db.subscriptions.hasMany(db.user_courses);
 // subscription to transaction 1-1
 db.subscriptions.belongsTo(db.transactions);
 db.transactions.hasOne(db.subscriptions);
+
+// transaction to subscriptionPlan 1-1
+db.transactions.belongsTo(db.subscription_plans);
+db.subscription_plans.hasOne(db.transactions);
 
 module.exports = {
   db,
