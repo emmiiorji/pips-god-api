@@ -80,6 +80,9 @@ db.transactions.hasOne(db.subscriptions);
 db.transactions.belongsTo(db.subscription_plans);
 db.subscription_plans.hasOne(db.transactions);
 
+// User - Notification (1:m)
+db.notifications.belongsTo(db.users, { allowNull: false });
+db.users.hasMany(db.notifications);
 module.exports = {
   db,
 };
