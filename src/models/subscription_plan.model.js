@@ -13,6 +13,10 @@ module.exports = (sequelize, dataType) => {
       type: dataType.INTEGER,
       allowNull: false,
     },
+    priceUnit: {
+      type: dataType.STRING,
+      defaultValue: 'kobo',
+    },
     validity: {
       type: dataType.INTEGER,
       defaultValue: 30,
