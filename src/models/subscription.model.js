@@ -6,6 +6,11 @@ module.exports = (sequelize, dataType) => {
       type: dataType.BOOLEAN,
       defaultValue: true,
     },
+    validity: {
+      type: dataType.INTEGER,
+      allowNull: false,
+      trim: true,
+    },
   });
 
   sequelizePaginate.paginate(subscription);
