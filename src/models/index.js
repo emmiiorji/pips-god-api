@@ -50,7 +50,7 @@ db.roles.belongsToMany(db.users, { through: 'user_roles' });
 
 // user to token 1-m
 db.users.hasMany(db.tokens);
-db.tokens.belongsTo(db.users, { allowNull: false });
+db.tokens.belongsTo(db.users, { foreignKey: { allowNull: false } });
 
 // role to permission
 db.users.belongsToMany(db.permissions, { through: 'role_permissions' });
@@ -69,19 +69,19 @@ db.users.belongsToMany(db.subscription_plans, { through: db.subscriptions });
 db.subscription_plans.belongsToMany(db.users, { through: db.subscriptions });
 
 // subscription to user course 1-m
-db.user_courses.belongsTo(db.subscriptions, { allowNull: false });
+db.user_courses.belongsTo(db.subscriptions, { foreignKey: { allowNull: false } });
 db.subscriptions.hasMany(db.user_courses);
 
 // subscription to transaction 1-1
 db.subscriptions.belongsTo(db.transactions);
 db.transactions.hasOne(db.subscriptions);
 
-// transaction to subscriptionPlan 1-1
-db.transactions.belongsTo(db.subscription_plans);
-db.subscription_plans.hasOne(db.transactions);
+// subscriptionPlan to transaction 1-m
+db.transactions.belongsTo(db.subscription_plans, { foreignKey: { allowNull: false } });
+db.subscription_plans.hasMany(db.transactions);
 
 // User - Notification (1:m)
-db.notifications.belongsTo(db.users, { allowNull: false });
+db.notifications.belongsTo(db.users, { foreignKey: { allowNull: false } });
 db.users.hasMany(db.notifications);
 module.exports = {
   db,
