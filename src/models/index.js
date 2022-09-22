@@ -38,6 +38,8 @@ db.user_courses = require('./user_course.model')(sequelizeInstance, Sequelize);
 db.permissions = require('./permission.model')(sequelizeInstance, Sequelize);
 db.courses = require('./course.model')(sequelizeInstance, Sequelize);
 db.notifications = require('./notification.model')(sequelizeInstance, Sequelize);
+db.message_templates = require('./message_template.model')(sequelizeInstance, Sequelize);
+db.message_variables = require('./variable.model')(sequelizeInstance, Sequelize);
 
 // relationships for models
 
@@ -83,6 +85,11 @@ db.subscription_plans.hasMany(db.transactions);
 // User - Notification (1:m)
 db.notifications.belongsTo(db.users, { foreignKey: { allowNull: false } });
 db.users.hasMany(db.notifications);
+
+// message template to variables m-m
+db.message_templates.belongsToMany(db.message_variables, { through: 'message_template_variables', onDelete: 'cascade' });
+db.message_variables.belongsToMany(db.message_templates, { through: 'message_variables' });
+
 module.exports = {
   db,
 };
