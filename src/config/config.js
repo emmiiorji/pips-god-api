@@ -72,7 +72,7 @@ module.exports = {
   client: {
     baseUrl: envVars.CLIENT_BASE_URL,
   },
-  bcrypt: {
+  bCrypt: {
     salt: envVars.BCRYPT_SALT,
   },
 };

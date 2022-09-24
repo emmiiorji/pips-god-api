@@ -1,8 +1,9 @@
 const httpStatus = require('http-status');
+const bcrypt = require('bcryptjs');
 const ApiError = require('../utils/ApiError');
 const { db } = require('../models');
 const logger = require('../config/logger');
-const { bcrypt } = require('../config/config');
+const { bCrypt } = require('../config/config');
 const pick = require('../utils/pick');
 
 /**
@@ -54,36 +55,51 @@ const isPasswordMatch = async function (password, user) {
  * @returns {Promise<User>}
  */
 const createUser = async (userBody) => {
-  const { reference, role, ...user } = userBody;
+  const { transactionReference, role, ...user } = userBody;
+  const userRole = await db.roles.findOne({ where: { name: 'user' } });
+
+  if (!userRole && role) throw new ApiError(httpStatus.BAD_REQUEST, 'Role does not exist');
 
   // TODO: If role is admin, check if user is admin or superadmin
 
-  const transaction = await db.transactions.findOne({ where: { reference } });
+  const transaction = await db.transactions.findOne({ where: { reference: transactionReference } });
   if (!transaction) throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Invalid transaction reference');
 
-  if (transaction.status !== 'success') throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Transaction was not successful');
+  if (transaction.status !== 'success') throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Please, complete your order');
 
   if (await isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
   // eslint-disable-next-line no-param-reassign
-  user.password = bcrypt.hashSync(user.password, bcrypt.salt);
+  user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
 
-  // Use a transaction to create the user and subscription
-  const sequelizeTransaction = await db.sequelize.transaction();
-  const userCreated = await db.users.create(user, { transaction: sequelizeTransaction });
-  await userCreated.addRole(role || 'user', { transaction: sequelizeTransaction });
-  await db.subscriptions.create(
-    {
-      userId: userCreated.id,
-      transactionId: transaction.id,
-      subscriptionPlanId: transaction.subscriptionPlanId,
-    },
-    { transaction: sequelizeTransaction }
-  );
+  let sequelizeTransaction;
+  try {
+    // Use a transaction to create the user and subscription
+    sequelizeTransaction = await db.sequelize.transaction();
+    const userCreated = await db.users.create(user, { transaction: sequelizeTransaction });
+    const subscriptionPlan = await db.subscription_plans.findByPk(transaction.subscriptionPlanId);
 
-  await sequelizeTransaction.commit();
-  return filterUser(userCreated);
+    await userCreated.addRole(role || userRole.id, { transaction: sequelizeTransaction });
+    await db.subscriptions.create(
+      {
+        userId: userCreated.id,
+        transactionId: transaction.id,
+        subscriptionPlanId: transaction.subscriptionPlanId,
+        validity: subscriptionPlan.validity,
+      },
+      { transaction: sequelizeTransaction }
+    );
+
+    await db.transactions.update({ isUsed: true }, { where: { id: transaction.id }, transaction: sequelizeTransaction });
+
+    await sequelizeTransaction.commit();
+    delete userCreated.dataValues.password;
+    return userCreated;
+  } catch (error) {
+    if (transaction) await transaction.rollback();
+    logger.error(error);
+  }
 };
 
 /**

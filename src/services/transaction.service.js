@@ -33,6 +33,8 @@ const initializeTransaction = async (transactionBody) => {
           reference: data.reference,
           accessCode: data.access_code,
           amount: subscriptionPlan.price,
+          amountUnit: subscriptionPlan.priceUnit,
+          subscriptionPlanId: subscriptionPlan.id,
         });
         return { authorizationUrl: body.data.authorization_url, reference: body.data.reference };
       }
@@ -49,13 +51,16 @@ const initializeTransaction = async (transactionBody) => {
 const verifyTransaction = async (reference) => {
   const transaction = await db.transactions.findOne({ where: { reference } });
   if (!transaction) throw new ApiError(httpStatus.NOT_FOUND, 'Transaction not found');
+  if (transaction.isUsed) throw new ApiError(httpStatus.CONFLICT, 'This transaction has been used before');
+
   try {
     const response = await paystack.transaction.verify(reference);
     if (!(response.data.amount === transaction.amount) && response.data.status === 'success') {
-      transaction.status = transactionStatuses.PARTIALLY_PAID;
+      await transaction.update({ status: transactionStatuses.PARTIALLY_PAID });
     } else if (transaction.status !== response.data.status) {
-      transaction.update({ status: response.data.status });
+      await db.transactions.update({ status: response.data.status }, { where: { id: transaction.id } });
     }
+    if (response.data.status !== 'success') return { status: response.data.status };
 
     // Record the transaction as a subscription
 
@@ -70,7 +75,6 @@ const verifyTransaction = async (reference) => {
     };
   } catch (error) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'An error occurred');
-    // console.error(error);
   }
 };
 
