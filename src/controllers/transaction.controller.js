@@ -10,7 +10,7 @@ const initializeTransaction = catchAsync(async (req, res) => {
 });
 
 const verifyTransaction = catchAsync(async (req, res) => {
-  const result = await transactionService.verifyTransaction(req.params.reference);
+  const result = await transactionService.verifyTransaction(req.params.accessCode);
   res.status(httpStatus.OK).send(result);
 });
 

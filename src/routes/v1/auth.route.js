@@ -37,9 +37,13 @@ module.exports = router;
  *           schema:
  *             type: object
  *             required:
- *               - name
+ *               - firstName
+ *               - lastName
  *               - email
  *               - password
+ *               - phone
+ *               - transactionAccessCode
+ *               - address
  *             properties:
  *               name:
  *                 type: string
@@ -52,14 +56,17 @@ module.exports = router;
  *                 format: password
  *                 minLength: 8
  *                 description: At least one number and one letter
+ *               phone:
+ *                 type: string
+ *                 description: User's phone number
  *             example:
  *                   email: example@email.com
  *                   password: password123
  *                   firstName: FakeFirstName
  *                   lastName: FakeLastName
- *                   phone: 07012345678
+ *                   phone: "07012345678"
  *                   address: No 3 some Street, some city
- *                   transactionReference: 5lhzjfpryj
+ *                   transactionAccessCode: 4uqdai5oux3kyr9
  *     responses:
  *       "201":
  *         description: Created

@@ -11,7 +11,7 @@ const register = {
     phone: Joi.string().trim().required(),
     address: Joi.string().trim().required(),
     role: Joi.string().trim(),
-    transactionReference: Joi.string().trim().required(),
+    transactionAccessCode: Joi.string().trim().required(),
   }),
 };
 

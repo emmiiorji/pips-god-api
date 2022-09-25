@@ -36,7 +36,7 @@ const initializeTransaction = async (transactionBody) => {
           amountUnit: subscriptionPlan.priceUnit,
           subscriptionPlanId: subscriptionPlan.id,
         });
-        return { authorizationUrl: body.data.authorization_url, reference: body.data.reference };
+        return { authorizationUrl: body.data.authorization_url };
       }
     }
   );
@@ -48,13 +48,13 @@ const initializeTransaction = async (transactionBody) => {
  * @param {Object} transactionBody
  * @returns {Promise<Object>}
  */
-const verifyTransaction = async (reference) => {
-  const transaction = await db.transactions.findOne({ where: { reference } });
+const verifyTransaction = async (accessCode) => {
+  const transaction = await db.transactions.findOne({ where: { accessCode } });
   if (!transaction) throw new ApiError(httpStatus.NOT_FOUND, 'Transaction not found');
   if (transaction.isUsed) throw new ApiError(httpStatus.CONFLICT, 'This transaction has been used before');
 
   try {
-    const response = await paystack.transaction.verify(reference);
+    const response = await paystack.transaction.verify(transaction.reference);
     if (!(response.data.amount === transaction.amount) && response.data.status === 'success') {
       await transaction.update({ status: transactionStatuses.PARTIALLY_PAID });
     } else if (transaction.status !== response.data.status) {
@@ -64,7 +64,7 @@ const verifyTransaction = async (reference) => {
 
     // Record the transaction as a subscription
 
-    const registrationUrl = `${client.baseUrl}/register/${reference}`;
+    const registrationUrl = `${client.baseUrl}/register/${accessCode}`; // Change access code to transaction id
 
     // Todo
     // Send email to the transaction email with registration link
@@ -89,8 +89,16 @@ const verifyTransaction = async (reference) => {
  */
 const queryTransactions = async (filter, options) => {
   if (options.sortBy !== undefined) {
+    const [sortBy, direction] = options.sortBy.split(':');
+    if (Object.keys(db.transactions.rawAttributes).includes(sortBy)) {
+      throw new ApiError(httpStatus.BAD_REQUEST, `Invalid column name for transaction`);
+    }
+    if (['asc', 'desc'].includes(direction.toLowerCase())) {
+      throw new ApiError(httpStatus.BAD_REQUEST, `Invalid order`);
+    }
+
     // eslint-disable-next-line no-param-reassign
-    options.order = [[options.sortBy, options.direction]];
+    options.order = [[sortBy, direction]];
   }
 
   // Todo

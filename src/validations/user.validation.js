@@ -9,7 +9,7 @@ const createUser = {
     lastName: Joi.string().required(),
     middleName: Joi.string(),
     role: Joi.string(),
-    transactionReference: Joi.string().required(),
+    transactionAccessCode: Joi.string().required(),
   }),
 };
 

@@ -55,17 +55,19 @@ const isPasswordMatch = async function (password, user) {
  * @returns {Promise<User>}
  */
 const createUser = async (userBody) => {
-  const { transactionReference, role, ...user } = userBody;
+  const { transactionAccessCode, role, ...user } = userBody;
   const userRole = await db.roles.findOne({ where: { name: 'user' } });
 
   if (!userRole && role) throw new ApiError(httpStatus.BAD_REQUEST, 'Role does not exist');
 
   // TODO: If role is admin, check if user is admin or superadmin
 
-  const transaction = await db.transactions.findOne({ where: { reference: transactionReference } });
-  if (!transaction) throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Invalid transaction reference');
+  const transaction = await db.transactions.findOne({ where: { accessCode: transactionAccessCode } });
+  if (!transaction) throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Invalid transaction access code');
 
   if (transaction.status !== 'success') throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Please, complete your order');
+
+  if (transaction.isUsed) throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'This transaction has been used');
 
   if (await isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
@@ -113,6 +115,14 @@ const createUser = async (userBody) => {
  */
 const queryUsers = async (filter, options) => {
   if (options.sortBy !== undefined) {
+    const [sortBy, direction] = options.sortBy.split(':');
+    if (Object.keys(db.transactions.rawAttributes).includes(sortBy)) {
+      throw new ApiError(httpStatus.BAD_REQUEST, `Invalid column name for user`);
+    }
+    if (['asc', 'desc'].includes(direction.toLowerCase())) {
+      throw new ApiError(httpStatus.BAD_REQUEST, `Invalid order`);
+    }
+
     // eslint-disable-next-line no-param-reassign
     options.order = [[options.sortBy, options.direction]];
   }

@@ -12,7 +12,7 @@ router
   .get(validate(transactionValidation.getTransactions), transactionController.getTransactions);
 
 router
-  .route('/verify/:reference')
+  .route('/verify/:accessCode')
   .get(validate(transactionValidation.verifyTransaction), transactionController.verifyTransaction);
 
 router
@@ -158,18 +158,18 @@ module.exports = router;
 
 /**
  * @swagger
- * /transactions/verify/{reference}:
+ * /transactions/verify/{accessCode}:
  *   get:
  *     summary: Verify a transaction
  *     description: Any body can verify a transaction.
  *     tags: [Transactions]
  *     parameters:
  *       - in: path
- *         name: reference
+ *         name: accessCode
  *         required: true
  *         schema:
  *           type: string
- *         description: Transaction reference
+ *         description: Transaction access code
  *     responses:
  *       "200":
  *         description: OK
