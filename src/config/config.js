@@ -26,6 +26,7 @@ const envVarsSchema = Joi.object()
     PAYSTACK_SECRET_KEY: Joi.string().description('the paystack secret key'),
     PAYSTACK_PUBLIC_KEY: Joi.string().description('the paystack public key'),
     CLIENT_BASE_URL: Joi.string().description('the client base url'),
+    CLIENT_BASE_URL_HOSTED: Joi.string().description('the url of hosted client'),
     BCRYPT_SALT: Joi.string().description('salt for bcrypt hashing'),
   })
   .unknown();
@@ -71,6 +72,7 @@ module.exports = {
   },
   client: {
     baseUrl: envVars.CLIENT_BASE_URL,
+    baseUrlHosted: envVars.CLIENT_BASE_URL_HOSTED || envVars.CLIENT_BASE_URL,
   },
   bCrypt: {
     salt: envVars.BCRYPT_SALT,
