@@ -53,9 +53,13 @@ module.exports = router;
  *                 minLength: 8
  *                 description: At least one number and one letter
  *             example:
- *               name: fake name
- *               email: fake@example.com
- *               password: password1
+ *                   email: example@email.com
+ *                   password: password123
+ *                   firstName: FakeFirstName
+ *                   lastName: FakeLastName
+ *                   phone: 07012345678
+ *                   address: No 3 some Street, some city
+ *                   transactionReference: 5lhzjfpryj
  *     responses:
  *       "201":
  *         description: Created
