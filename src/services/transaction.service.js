@@ -1,4 +1,5 @@
 const httpStatus = require('http-status');
+const { nanoid } = require('nanoid');
 const paystack = require('paystack')(require('../config/config').paystack.secretKey);
 const { client } = require('../config/config');
 const ApiError = require('../utils/ApiError');
@@ -15,11 +16,14 @@ const initializeTransaction = async (transactionBody) => {
     where: { name: transactionBody.subscriptionPlanName },
   });
   if (!subscriptionPlan) throw new ApiError(httpStatus.NOT_FOUND, 'Subscription plan not found');
+
+  const transactionId = nanoid();
   const result = await paystack.transaction.initialize(
     {
       email: transactionBody.email,
       amount: subscriptionPlan.price, // in kobo (100 kobo = 1 naira)
       currency: transactionBody.currency || 'NGN',
+      callback_url: `${client.baseUrlHosted}/paystack/success/${transactionId}`,
     },
     async function (error, body) {
       if (error) {
@@ -27,6 +31,7 @@ const initializeTransaction = async (transactionBody) => {
       } else {
         const { data } = body;
         await db.transactions.create({
+          id: transactionId,
           status: body.status ? 'initiated' : 'failed',
           email: transactionBody.email,
           authorizationUrl: data.authorization_url,
@@ -48,8 +53,9 @@ const initializeTransaction = async (transactionBody) => {
  * @param {Object} transactionBody
  * @returns {Promise<Object>}
  */
-const verifyTransaction = async (accessCode) => {
-  const transaction = await db.transactions.findOne({ where: { accessCode } });
+const verifyTransaction = async (transactionId) => {
+  const transaction = await db.transactions.findOne({ where: { id: transactionId } });
+
   if (!transaction) throw new ApiError(httpStatus.NOT_FOUND, 'Transaction not found');
   if (transaction.isUsed) throw new ApiError(httpStatus.CONFLICT, 'This transaction has been used before');
 
@@ -64,7 +70,7 @@ const verifyTransaction = async (accessCode) => {
 
     // Record the transaction as a subscription
 
-    const registrationUrl = `${client.baseUrl}/register/${accessCode}`; // Change access code to transaction id
+    const registrationUrl = `${client.baseUrl}/register/${transaction.accessCode}`; // Change access code to transaction id
 
     // Todo
     // Send email to the transaction email with registration link
