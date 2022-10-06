@@ -64,11 +64,11 @@ const createUser = async (userBody) => {
   // TODO: If role is admin, check if user is admin or superadmin
 
   const transaction = await db.transactions.findOne({ where: { id: transactionId } });
-  if (!transaction) throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Invalid transaction access code');
+  if (!transaction) throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Invalid transaction ID');
 
   if (transaction.status !== 'success') throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Please, complete your order');
 
-  if (transaction.isUsed) throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'This transaction has been used');
+  if (transaction.isUsed) throw new ApiError(httpStatus.ALREADY_REPORTED, 'This transaction has been used');
 
   if (await isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
