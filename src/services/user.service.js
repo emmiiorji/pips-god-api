@@ -56,13 +56,14 @@ const isPasswordMatch = async function (password, user) {
  */
 const createUser = async (userBody) => {
   const { transactionAccessCode, role, ...user } = userBody;
+  const transactionId = transactionAccessCode;
   const userRole = await db.roles.findOne({ where: { name: 'user' } });
 
   if (!userRole && role) throw new ApiError(httpStatus.BAD_REQUEST, 'Role does not exist');
 
   // TODO: If role is admin, check if user is admin or superadmin
 
-  const transaction = await db.transactions.findOne({ where: { accessCode: transactionAccessCode } });
+  const transaction = await db.transactions.findOne({ where: { id: transactionId } });
   if (!transaction) throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Invalid transaction access code');
 
   if (transaction.status !== 'success') throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Please, complete your order');
