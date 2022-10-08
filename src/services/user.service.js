@@ -154,7 +154,17 @@ const getUserById = async (id) => {
  * @returns {Promise<User>}
  */
 const getUserByEmail = async (email) => {
-  return filterUser(await db.users.findOne({ where: { email }, include: db.roles }));
+  return filterUser(
+    await db.users.findOne({
+      where: { email },
+      include: {
+        model: db.roles,
+        as: 'roles',
+        attributes: ['name'],
+        through: { attributes: [] },
+      },
+    })
+  );
 };
 
 /**
