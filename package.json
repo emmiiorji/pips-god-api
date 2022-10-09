@@ -72,6 +72,7 @@
     "pm2": "^5.1.0",
     "sequelize": "^6.25.3",
     "sequelize-paginate": "^1.1.6",
+    "speakeasy": "^2.0.0",
     "swagger-jsdoc": "^6.0.8",
     "swagger-ui-express": "^4.1.6",
     "validator": "^13.0.0",
