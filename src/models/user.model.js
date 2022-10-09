@@ -1,3 +1,4 @@
+const speakeasy = require('speakeasy');
 const validator = require('validator');
 const sequelizePaginate = require('sequelize-paginate');
 const { nanoid } = require('nanoid');
@@ -6,7 +7,6 @@ module.exports = (sequelize, dataType) => {
   const user = sequelize.define('user', {
     id: {
       type: dataType.STRING,
-      // eslint-disable-next-line global-require
       defaultValue: () => nanoid(),
       primaryKey: true,
     },
@@ -50,6 +50,11 @@ module.exports = (sequelize, dataType) => {
     isEmailVerified: {
       type: dataType.BOOLEAN,
       defaultValue: false,
+    },
+    otpSecret: {
+      type: dataType.STRING,
+      unique: true,
+      defaultValue: () => speakeasy.generateSecret().base32,
     },
   });
 
