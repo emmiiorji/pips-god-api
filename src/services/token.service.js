@@ -64,7 +64,7 @@ const verifyToken = async (token, email) => {
     time: config.jwt.otpExpirationMinutes * 60,
   });
 
-  return verified;
+  return { verified, user };
 };
 
 /**
@@ -112,7 +112,7 @@ const generateOTP = (secret) => {
   const totp = speakeasy.totp({
     secret: secret.base32,
     encoding: 'base32',
-    time: config.jwt.otpExpirationMinutes * 60,
+    step: config.jwt.otpExpirationMinutes * 60,
   });
   return totp;
 };

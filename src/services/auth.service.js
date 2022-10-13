@@ -1,4 +1,5 @@
 const httpStatus = require('http-status');
+const speakeasy = require('speakeasy');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
 const { db } = require('../models');
@@ -58,17 +59,21 @@ const refreshAuth = async (refreshToken) => {
  * @returns {Promise}
  */
 const resetPassword = async (resetPasswordToken, requestBody) => {
-  try {
-    const resetPasswordTokenDoc = await tokenService.verifyToken(resetPasswordToken, requestBody.email);
-    const user = await userService.getUserById(resetPasswordTokenDoc.user);
-    if (!user) {
-      throw new Error();
-    }
-    await userService.updateUserById(user.id, { password: requestBody.password });
-    // await db.tokens.destroy({ where: { user: user.id, type: tokenTypes.RESET_PASSWORD } });
-  } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Password reset failed');
+  // save is false when we're the only checking if the user's entered token is valid
+  const save = requestBody.save || false;
+
+  const { verified, user } = await tokenService.verifyToken(resetPasswordToken, requestBody.email);
+  if (!verified) throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token');
+
+  if (!save) {
+    return 'Token is valid';
   }
+  if (!requestBody.password) throw new ApiError(httpStatus.BAD_REQUEST, 'Password is required');
+  await userService.updateUserById(user.id, {
+    password: requestBody.password,
+    otpSecret: speakeasy.generateSecret().base32,
+  });
+  return 'Password updated successfully';
 };
 
 /**
