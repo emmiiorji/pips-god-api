@@ -33,11 +33,11 @@ const sendResetPasswordEmail = async (user, token) => {
   const subject = 'Reset password: OTP';
 
   const text = `Dear ${user.firstName},
-You requested to reset your password. Kindly enter the One Time Password below:
+You requested to reset your password. Kindly enter the One Time Password below (valid for 5mins):
 
 ${token}
 
-If you did not request any password resets, then ignore this email and do not share with a third party.`;
+If you did not request any password reset, we assure that your account is secure. Please ignore this email and do not share with a third party.`;
   await sendEmail(user.email, subject, text);
 };
 
