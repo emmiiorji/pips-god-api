@@ -236,6 +236,7 @@ module.exports = router;
  *             type: object
  *             required:
  *               - password
+ *               - email
  *             properties:
  *               password:
  *                 type: string
@@ -244,6 +245,7 @@ module.exports = router;
  *                 description: At least one number and one letter
  *             example:
  *               password: password1
+ *               email: something@email.com
  *     responses:
  *       "204":
  *         description: No content

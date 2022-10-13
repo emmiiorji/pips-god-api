@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
 const httpStatus = require('http-status');
+const speakeasy = require('speakeasy');
 const config = require('../config/config');
 const userService = require('./user.service');
 const { db } = require('../models');
@@ -51,13 +52,19 @@ const saveToken = async (token, userId, expires, type, blacklisted = false) => {
  * @param {string} type
  * @returns {Promise<Token>}
  */
-const verifyToken = async (token, type) => {
-  const payload = jwt.verify(token, config.jwt.secret);
-  const tokenDoc = await db.tokens.findOne({ where: { token, type, user: payload.sub, blacklisted: false } });
-  if (!tokenDoc) {
-    throw new Error('Token not found');
+const verifyToken = async (token, email) => {
+  const user = await db.users.findOne({ where: { email } });
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
   }
-  return tokenDoc;
+  const verified = speakeasy.totp.verify({
+    secret: user.otpSecret,
+    encoding: 'base32',
+    token,
+    time: config.jwt.otpExpirationMinutes * 60,
+  });
+
+  return verified;
 };
 
 /**
@@ -101,6 +108,27 @@ const generateResetPasswordToken = async (email) => {
   return resetPasswordToken;
 };
 
+const generateOTP = (secret) => {
+  const totp = speakeasy.totp({
+    secret: secret.base32,
+    encoding: 'base32',
+    time: config.jwt.otpExpirationMinutes * 60,
+  });
+  return totp;
+};
+
+const generateResetPasswordOTP = async (email) => {
+  const user = await userService.getUserByEmail(email);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
+  }
+
+  // const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
+  const resetPasswordOTP = generateOTP(user.otpSecret);
+  // await saveToken(resetPasswordToken, user.id, expires, tokenTypes.RESET_PASSWORD);
+  return { user, resetPasswordOTP };
+};
+
 /**
  * Generate verify email token
  * @param {User} user
@@ -119,5 +147,6 @@ module.exports = {
   verifyToken,
   generateAuthTokens,
   generateResetPasswordToken,
+  generateResetPasswordOTP,
   generateVerifyEmailToken,
 };
