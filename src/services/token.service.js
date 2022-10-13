@@ -58,10 +58,10 @@ const verifyToken = async (token, email) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
   }
   const verified = speakeasy.totp.verify({
-    secret: user.otpSecret,
+    secret: parseInt(user.otpSecret, 10),
     encoding: 'base32',
     token,
-    time: config.jwt.otpExpirationMinutes * 60,
+    step: config.jwt.otpExpirationMinutes * 60,
   });
 
   return { verified, user };
