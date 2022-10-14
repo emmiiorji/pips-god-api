@@ -48,6 +48,7 @@ const resetPassword = {
     password: Joi.string().custom(password),
     email: Joi.string().email().required(),
     save: Joi.boolean(),
+    token: Joi.string(),
   }),
 };
 
