@@ -29,12 +29,12 @@ const forgotPassword = catchAsync(async (req, res) => {
   // const resetPasswordToken = await tokenService.generateResetPasswordToken(req.body.email);
   const { user, resetPasswordOTP } = await tokenService.generateResetPasswordOTP(req.body.email);
   await emailService.sendResetPasswordEmail(user, resetPasswordOTP);
-  res.status(httpStatus.OK).send({ message: 'Check your email for otp to reset password' });
+  res.status(httpStatus.OK).send({ message: 'Check your email for otp to reset password', code: 200 });
 });
 
 const resetPassword = catchAsync(async (req, res) => {
-  await authService.resetPassword(req.query.token, req.body);
-  res.status(httpStatus.NO_CONTENT).send();
+  const message = await authService.resetPassword(req.query.token, req.body);
+  res.status(httpStatus.OK).send({ message, code: 200 });
 });
 
 const sendVerificationEmail = catchAsync(async (req, res) => {
