@@ -182,7 +182,7 @@ const updateUserById = async (userId, updateBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
   Object.assign(user, updateBody);
-  await db.users.update(user);
+  await db.users.update(user, { where: { id: userId } });
   return user;
 };
 
