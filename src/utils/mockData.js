@@ -4,10 +4,12 @@ const { db } = require('../models');
 const createDummySubscriptionPlans = async () => {
   const dummyPlans = [
     {
+      title: 'VIP Signals',
       name: 'vip_signals',
       price: '1000000',
     },
     {
+      title: 'Training and Mentoring',
       name: 'training_and_mentoring',
       price: '1200000',
     },

@@ -3,6 +3,12 @@ const { dateUnits } = require('../config/dateUnits');
 
 module.exports = (sequelize, dataType) => {
   const subscriptionPlan = sequelize.define('subscription_plan', {
+    title: {
+      type: dataType.STRING,
+      unique: true,
+      allowNull: false,
+      trim: true,
+    },
     name: {
       type: dataType.STRING,
       unique: true,
