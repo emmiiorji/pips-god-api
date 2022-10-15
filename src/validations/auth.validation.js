@@ -11,7 +11,7 @@ const register = {
     phone: Joi.string().trim().required(),
     address: Joi.string().trim().required(),
     role: Joi.string().trim(),
-    transactionAccessCode: Joi.string().trim().required(),
+    transactionAccessCode: Joi.string().trim().required(), // This has changed to transsaction ID
   }),
 };
 
@@ -55,6 +55,7 @@ const resetPassword = {
 const verifyEmail = {
   query: Joi.object().keys({
     token: Joi.string().required(),
+    trans: Joi.string(),
   }),
 };
 
