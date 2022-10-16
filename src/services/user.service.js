@@ -56,7 +56,7 @@ const isPasswordMatch = async function (password, user) {
  */
 const createUser = async (userBody) => {
   const { transactionAccessCode, role, ...user } = userBody;
-  const transactionId = transactionAccessCode;
+  const transactionId = transactionAccessCode; // The data expected is transaction ID not access code
   const userRole = await db.roles.findOne({ where: { name: 'user' } });
 
   if (!userRole && role) throw new ApiError(httpStatus.BAD_REQUEST, 'Role does not exist');
@@ -94,7 +94,7 @@ const createUser = async (userBody) => {
       { transaction: sequelizeTransaction }
     );
 
-    await db.transactions.update({ isUsed: true }, { where: { id: transaction.id }, transaction: sequelizeTransaction });
+    // await db.transactions.update({ isUsed: true }, { where: { id: transaction.id }, transaction: sequelizeTransaction });
 
     await sequelizeTransaction.commit();
     delete userCreated.dataValues.password;
