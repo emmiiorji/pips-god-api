@@ -5,6 +5,7 @@ const { client } = require('../config/config');
 const ApiError = require('../utils/ApiError');
 const { db } = require('../models');
 const { transactionStatuses } = require('../config/transactionStatus');
+const { emailService } = require('.');
 
 /**
  * Initialize a transaction
@@ -59,6 +60,8 @@ const verifyTransaction = async (transactionId) => {
   if (!transaction) throw new ApiError(httpStatus.NOT_FOUND, 'Transaction not found');
   if (transaction.isUsed) throw new ApiError(httpStatus.CONFLICT, 'This transaction has been used before');
 
+  const subscriptionPlan = await db.subscription_plans.findOne({ where: { id: transaction.subscriptionPlanId } });
+
   try {
     const response = await paystack.transaction.verify(transaction.reference);
     if (!(response.data.amount === transaction.amount) && response.data.status === 'success') {
@@ -70,10 +73,11 @@ const verifyTransaction = async (transactionId) => {
 
     // Record the transaction as a subscription
 
-    const registrationUrl = `${client.baseUrl}/register/${transaction.accessCode}`; // Change access code to transaction id
+    const registrationUrl = `${client.baseUrl}/register/${transaction.id}`; // Change access code to transaction id
 
     // Todo
     // Send email to the transaction email with registration link
+    emailService.sendRegistrationEmail(transaction, registrationUrl, subscriptionPlan.title);
 
     return {
       status: response.data.status,
