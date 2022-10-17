@@ -1,11 +1,13 @@
 const httpStatus = require('http-status');
 const speakeasy = require('speakeasy');
+const bcrypt = require('bcryptjs');
 const userService = require('./user.service');
 const tokenService = require('./token.service');
 const emailService = require('./email.service');
 const { db } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
+const { bCrypt } = require('../config/config');
 
 /**
  * Login with username and password
@@ -71,7 +73,7 @@ const resetPassword = async (resetPasswordToken, requestBody) => {
   }
   if (!requestBody.password) throw new ApiError(httpStatus.BAD_REQUEST, 'Password is required');
   await userService.updateUserById(user.id, {
-    password: requestBody.password,
+    password: bcrypt.hashSync(requestBody.password, bCrypt.salt || 10),
     otpSecret: speakeasy.generateSecret().base32,
   });
   return 'Password updated successfully';
