@@ -1,7 +1,8 @@
 const httpStatus = require('http-status');
 const speakeasy = require('speakeasy');
-const tokenService = require('./token.service');
 const userService = require('./user.service');
+const tokenService = require('./token.service');
+const emailService = require('./email.service');
 const { db } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
@@ -62,7 +63,7 @@ const resetPassword = async (resetPasswordToken, requestBody) => {
   // save is false when we're the only checking if the user's entered token is valid
   const save = requestBody.save || false;
 
-  const { verified, user } = await tokenService.verifyToken(resetPasswordToken, requestBody.email);
+  const { verified, user } = await tokenService.verifyOTP(resetPasswordToken, requestBody.email);
   if (!verified) throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid token');
 
   if (!save) {
@@ -81,18 +82,42 @@ const resetPassword = async (resetPasswordToken, requestBody) => {
  * @param {string} verifyEmailToken
  * @returns {Promise}
  */
-const verifyEmail = async (verifyEmailToken) => {
+const verifyEmail = async (verifyEmailToken, transactionId) => {
+  const transaction = await db.transactions.findOne({ where: { id: transactionId } });
+  let user;
   try {
     const verifyEmailTokenDoc = await tokenService.verifyToken(verifyEmailToken, tokenTypes.VERIFY_EMAIL);
-    const user = await userService.getUserById(verifyEmailTokenDoc.user);
-    if (!user) {
-      throw new Error();
-    }
-    await db.tokens.destroy({ where: { user: user.id, type: tokenTypes.VERIFY_EMAIL } });
-    await userService.updateUserById(user.id, { isEmailVerified: true });
+    user = await userService.getUserById(verifyEmailTokenDoc.userId);
   } catch (error) {
+    if (transaction && !transaction.isUsed) {
+      const subscription = await db.subscriptions.findOne({ where: { transactionId } });
+      user = await db.users.findOne({ where: { id: subscription.userId } });
+
+      const newVerifyEmailToken = await tokenService.generateVerifyEmailToken(user);
+      await emailService.resendVerificationEmail(user, newVerifyEmailToken, transaction.id);
+
+      throw new ApiError(
+        httpStatus.PERMANENT_REDIRECT,
+        'Your token seems to have expired. A new link has been sent to your mail'
+      );
+    }
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Email verification failed');
   }
+
+  if (user.isEmailVerified) {
+    throw new ApiError(httpStatus.ALREADY_REPORTED, 'Email already verified');
+  }
+
+  await db.tokens.destroy({ where: { userId: user.id, type: tokenTypes.VERIFY_EMAIL } });
+  await userService.updateUserById(user.id, { isEmailVerified: true });
+
+  // TODO: Send email to user that their email has been verified
+
+  const subscription = await db.subscriptions.findOne({ where: { transactionId } });
+  if (!subscription) {
+    throw new Error();
+  }
+  await db.transactions.update({ isUsed: true }, { where: { id: subscription.transactionId } });
 };
 
 module.exports = {
