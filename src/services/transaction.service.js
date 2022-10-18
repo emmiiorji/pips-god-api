@@ -73,7 +73,7 @@ const verifyTransaction = async (transactionId) => {
 
     // Record the transaction as a subscription
 
-    const registrationUrl = `${client.baseUrl}/register/${transaction.id}`; // Change access code to transaction id
+    const registrationUrl = `${client.baseUrlHosted}/register/${transaction.id}`; // Change access code to transaction id
 
     // Todo
     // Send email to the transaction email with registration link
