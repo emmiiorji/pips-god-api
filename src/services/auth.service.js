@@ -95,15 +95,18 @@ const verifyEmail = async (verifyEmailToken, transactionId) => {
       const subscription = await db.subscriptions.findOne({ where: { transactionId } });
       user = await db.users.findOne({ where: { id: subscription.userId } });
 
-      const newVerifyEmailToken = await tokenService.generateVerifyEmailToken(user);
-      await emailService.resendVerificationEmail(user, newVerifyEmailToken, transaction.id);
-
-      throw new ApiError(
-        httpStatus.PERMANENT_REDIRECT,
-        'Your token seems to have expired. A new link has been sent to your mail'
-      );
+      if (!user.isEmailVerified) {
+        const newVerifyEmailToken = await tokenService.generateVerifyEmailToken(user);
+        await emailService.resendVerificationEmail(user, newVerifyEmailToken, transaction.id);
+        throw new ApiError(
+          httpStatus.PERMANENT_REDIRECT,
+          'Your token seems to have expired. A new link has been sent to your mail'
+        );
+      }
+      throw new ApiError(httpStatus.ALREADY_REPORTED, 'Email already verified');
+    } else {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Email verification failed');
     }
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Email verification failed');
   }
 
   if (user.isEmailVerified) {
@@ -120,6 +123,7 @@ const verifyEmail = async (verifyEmailToken, transactionId) => {
     throw new Error();
   }
   await db.transactions.update({ isUsed: true }, { where: { id: subscription.transactionId } });
+  return user;
 };
 
 module.exports = {
