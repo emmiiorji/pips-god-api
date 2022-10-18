@@ -50,7 +50,7 @@ If you did not request any password reset, we assure that your account is secure
 const sendVerificationEmail = async (user, token, transactionId) => {
   const subject = 'Email Verification';
   // replace this url with the link to the email verification page of your front-end app
-  const verificationEmailUrl = `${config.client.baseUrl}/verify-email?token=${token}${transactionId ? '&trans=' : ''}${
+  const verificationEmailUrl = `${config.client.baseUrlHosted}/verify-email?token=${token}${transactionId ? '&trans=' : ''}${
     transactionId || ''
   }`;
   const text = `Dear ${user.firstName || 'user'},
@@ -67,7 +67,7 @@ The Pipsgod Team.`;
 const resendVerificationEmail = async (user, token, transactionId) => {
   const subject = 'Re: Email Verification';
   // replace this url with the link to the email verification page of your front-end app
-  const verificationEmailUrl = `${config.client.baseUrl}/verify-email?token=${token}${transactionId ? '&trans=' : ''}${
+  const verificationEmailUrl = `${config.client.baseUrlHosted}/verify-email?token=${token}${transactionId ? '&trans=' : ''}${
     transactionId || ''
   }`;
   const text = `Dear ${user.firstName || 'user'},
