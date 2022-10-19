@@ -57,6 +57,10 @@ module.exports = (sequelize, dataType) => {
       type: dataType.BOOLEAN,
       defaultValue: false,
     },
+    sentRegistrationEmail: {
+      type: dataType.BOOLEAN,
+      defaultValue: false,
+    },
   });
 
   sequelizePaginate.paginate(transaction);
