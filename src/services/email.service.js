@@ -64,6 +64,23 @@ The Pipsgod Team.`;
   await sendEmail(user.email, subject, text);
 };
 
+const confirmEmailVerification = async (user) => {
+  const subject = 'Welcome to Pipsgod Academy';
+
+  const text = `Dear ${user.firstName} ,
+
+Welcome to Pipsgod Academy. Your email has been verified succesfully and we're glad to have you.
+
+Log in to your dashboard to explore:
+${config.client.baseUrlHosted}/portal
+
+Thank you again.
+
+Regards,
+The Pipsgod Academy Team.`;
+  await sendEmail(user.email, subject, text);
+};
+
 const resendVerificationEmail = async (user, token, transactionId) => {
   const subject = 'Re: Email Verification';
   // replace this url with the link to the email verification page of your front-end app
@@ -102,4 +119,5 @@ module.exports = {
   sendVerificationEmail,
   sendRegistrationEmail,
   resendVerificationEmail,
+  confirmEmailVerification,
 };
