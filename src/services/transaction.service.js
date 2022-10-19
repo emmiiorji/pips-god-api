@@ -76,13 +76,13 @@ const verifyTransaction = async (transactionId) => {
     const registrationUrl = `${client.baseUrlHosted}/register/${transaction.id}`; // Change access code to transaction id
 
     // Todo
-    // Send email to the transaction email with registration link
-    emailService.sendRegistrationEmail(transaction, registrationUrl, subscriptionPlan.title);
+    // Only send registration link if it's a registration.
+    if (!transaction.sentRegistrationEmail) {
+      await emailService.sendRegistrationEmail(transaction, registrationUrl, subscriptionPlan.title);
+      await db.transactions.update({ sentRegistrationEmail: true }, { where: { id: transaction.id } });
+    }
 
-    return {
-      status: response.data.status,
-      registrationUrl,
-    };
+    return { status: response.data.status };
   } catch (error) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'An error occurred');
   }
