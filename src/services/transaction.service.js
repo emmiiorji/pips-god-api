@@ -77,6 +77,7 @@ const verifyTransaction = async (transactionId) => {
 
     // Todo
     // Only send registration link if it's a registration.
+
     if (!transaction.sentRegistrationEmail) {
       await emailService.sendRegistrationEmail(transaction, registrationUrl, subscriptionPlan.title);
       await db.transactions.update({ sentRegistrationEmail: true }, { where: { id: transaction.id } });

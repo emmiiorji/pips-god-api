@@ -50,7 +50,7 @@ const sendVerificationEmail = catchAsync(async (req, res) => {
 const verifyEmail = catchAsync(async (req, res) => {
   const user = await authService.verifyEmail(req.query.token, req.query.trans);
 
-  const tokens = await tokenService.generateAuthTokens(user.dataValues.id);
+  const tokens = await tokenService.generateAuthTokens(user.id);
   await emailService.confirmEmailVerification(user);
   res.status(httpStatus.OK).send({ data: { user, tokens }, message: 'Email has been verified', code: 200 });
 });
