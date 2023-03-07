@@ -4,8 +4,12 @@ const { authService, userService, tokenService, emailService } = require('../ser
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
-  const tokens = await tokenService.generateAuthTokens(user.dataValues.id);
-  res.status(httpStatus.CREATED).send({ user, tokens });
+  const transactionId = req.body.transactionAccessCode;
+
+  const verifyEmailToken = await tokenService.generateVerifyEmailToken(user);
+  await emailService.sendVerificationEmail(user, verifyEmailToken, transactionId);
+
+  res.status(httpStatus.CREATED).send({ message: 'Check your email for link to Verify your account', code: 201 });
 });
 
 const login = catchAsync(async (req, res) => {
@@ -44,8 +48,8 @@ const sendVerificationEmail = catchAsync(async (req, res) => {
 });
 
 const verifyEmail = catchAsync(async (req, res) => {
-  await authService.verifyEmail(req.query.token);
-  res.status(httpStatus.NO_CONTENT).send();
+  await authService.verifyEmail(req.query.token, req.query.trans);
+  res.status(httpStatus.OK).send({ message: 'Email has been verified', code: 200 });
 });
 
 module.exports = {
