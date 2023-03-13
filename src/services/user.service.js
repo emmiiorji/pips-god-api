@@ -21,7 +21,7 @@ const removePassword = (user) => {
   if (typeof user === 'object' && user !== null && !Array.isArray(user)) {
     return pick(
       user.dataValues,
-      Object.keys(user.dataValues).filter((key) => key !== 'password')
+      Object.keys(user.dataValues).filter((key) => !['password', 'otpSecret'].includes(key))
     );
   }
   return user;
