@@ -38,7 +38,7 @@ module.exports = (sequelize, dataType) => {
     },
     password: {
       type: dataType.STRING,
-      allowNull: false,
+      // allowNull: false,
       trim: true,
       minlength: 8,
       validate(value) {
@@ -55,6 +55,12 @@ module.exports = (sequelize, dataType) => {
       type: dataType.STRING,
       unique: true,
       defaultValue: () => speakeasy.generateSecret().base32,
+    },
+    telegramUsername: {
+      type: dataType.STRING,
+      unique: true,
+      trim: true,
+      lowercase: true,
     },
   });
 

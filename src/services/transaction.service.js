@@ -6,27 +6,68 @@ const ApiError = require('../utils/ApiError');
 const { db } = require('../models');
 const { transactionStatuses } = require('../config/transactionStatus');
 const { emailService } = require('.');
+const { subscriptionNames } = require('../config/subscriptionPlanNames');
+const logger = require('../config/logger');
+
+const camelToCapitalized = (str) => {
+  let words = str.match(/[A-Z][a-z]+/g);
+  const firstWord = str.match(/[a-z]+[A-Z]?/g);
+  words = words ? [firstWord[0].slice(0, -1), ...words] : firstWord;
+
+  for (let i = 0; i < words.length; i += 1) {
+    words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+  }
+
+  return words.join(' ');
+};
+
+const getPaystackCustomFields = (metadata) => {
+  const customFields = [];
+  Object.keys(metadata).forEach((key) => {
+    customFields.push({
+      display_name: camelToCapitalized(key),
+      variable_name: key,
+      value: metadata[key],
+    });
+  });
+  return customFields;
+};
 
 /**
  * Initialize a transaction
  * @param {Object} transactionBody
  * @returns {Promise<Object>}
  */
-const initializeTransaction = async (transactionBody) => {
+const initializeTransaction = async (transactionBody, isRenew = false) => {
+  const { email, currency, subscriptionPlanName, ...metadata } = transactionBody;
+  const isVipSignals = subscriptionPlanName === subscriptionNames.VIP_SIGNALS;
   const subscriptionPlan = await db.subscription_plans.findOne({
-    where: { name: transactionBody.subscriptionPlanName },
+    where: { name: subscriptionPlanName },
   });
+
   if (!subscriptionPlan) throw new ApiError(httpStatus.NOT_FOUND, 'Subscription plan not found');
+
+  if (isVipSignals) {
+    const { telegramUsername } = metadata;
+    const user = await db.users.findOne({ where: { telegramUsername } });
+    if (user && !isRenew) throw new ApiError(httpStatus.ALREADY_REPORTED, 'User with telegram username already exists');
+    // return;
+  }
 
   const transactionId = nanoid();
   const result = await paystack.transaction.initialize(
     {
-      email: transactionBody.email,
+      email,
       amount: subscriptionPlan.price, // in kobo (100 kobo = 1 naira)
-      currency: transactionBody.currency || 'NGN',
-      callback_url: `${client.baseUrlHosted}/paystack/success/${transactionId}`,
+      currency: currency || 'NGN',
+      callback_url: `${client.baseUrlHosted}/paystack/success/${transactionId}?vip_signal=${
+        isVipSignals ? 'true' : 'false'
+      }`,
+      metadata: {
+        custom_fields: getPaystackCustomFields({ ...metadata, email }),
+      },
     },
-    async function (error, body) {
+    async (error, body) => {
       if (error) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'An error occurred');
       } else {
@@ -54,13 +95,14 @@ const initializeTransaction = async (transactionBody) => {
  * @param {Object} transactionBody
  * @returns {Promise<Object>}
  */
-const verifyTransaction = async (transactionId) => {
+const verifyTransaction = async (transactionId, isRenew = false) => {
   const transaction = await db.transactions.findOne({ where: { id: transactionId } });
 
   if (!transaction) throw new ApiError(httpStatus.NOT_FOUND, 'Transaction not found');
   if (transaction.isUsed) throw new ApiError(httpStatus.CONFLICT, 'This transaction has been used before');
 
   const subscriptionPlan = await db.subscription_plans.findOne({ where: { id: transaction.subscriptionPlanId } });
+  const isVipSignals = subscriptionPlan.name === subscriptionNames.VIP_SIGNALS;
 
   try {
     const response = await paystack.transaction.verify(transaction.reference);
@@ -73,16 +115,52 @@ const verifyTransaction = async (transactionId) => {
 
     // Record the transaction as a subscription
 
-    const registrationUrl = `${client.baseUrlHosted}/register/${transaction.id}`; // Change access code to transaction id
+    let sequelizeTransaction;
+    if (isVipSignals) {
+      try {
+        // Use a transaction to create the user and subscription
+        const user = response.data.metadata.custom_fields.reduce((acc, field) => {
+          acc[field.variable_name] = field.value;
+          return acc;
+        }, {});
+        sequelizeTransaction = await db.sequelize.transaction();
+        const userCreated = await db.users.create(user, { transaction: sequelizeTransaction });
 
-    // Todo
-    // Only send registration link if it's a registration.
+        const userRole = await db.roles.findOne({ where: { name: 'user' } });
+        await userCreated.addRole(userRole.id, { transaction: sequelizeTransaction });
+        await db.subscriptions.create(
+          {
+            userId: userCreated.id,
+            transactionId: transaction.id,
+            subscriptionPlanId: transaction.subscriptionPlanId,
+            validity: subscriptionPlan.validity,
+          },
+          { transaction: sequelizeTransaction }
+        );
 
-    if (!transaction.sentRegistrationEmail) {
-      await emailService.sendRegistrationEmail(transaction, registrationUrl, subscriptionPlan.title);
-      await db.transactions.update({ sentRegistrationEmail: true }, { where: { id: transaction.id } });
+        await db.transactions.update({ isUsed: true }, { where: { id: transaction.id }, transaction: sequelizeTransaction });
+
+        await emailService.sendVipSignalsEmail(transaction, subscriptionPlan);
+        await sequelizeTransaction.commit();
+        return { status: response.data.status };
+      } catch (error) {
+        if (sequelizeTransaction) await sequelizeTransaction.rollback();
+        logger.error(error);
+        throw new ApiError(httpStatus.BAD_REQUEST, 'An error occurred');
+      }
     }
 
+    if (!isRenew) {
+      const registrationUrl = `${client.baseUrlHosted}/register/${transaction.id}`; // Change access code to transaction id
+
+      // Todo
+      // Only send registration link if it's a registration.
+
+      if (!transaction.sentRegistrationEmail) {
+        await emailService.sendRegistrationEmail(transaction, registrationUrl, subscriptionPlan.title);
+        await db.transactions.update({ sentRegistrationEmail: true }, { where: { id: transaction.id } });
+      }
+    }
     return { status: response.data.status };
   } catch (error) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'An error occurred');

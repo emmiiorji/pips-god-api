@@ -31,6 +31,10 @@ module.exports = (sequelize, dataType) => {
       type: dataType.ENUM(...Object.values(dateUnits)),
       defaultValue: dateUnits.DAYS,
     },
+    telegramUGroupUrl: {
+      type: dataType.STRING,
+      trim: true,
+    },
   });
 
   sequelizePaginate.paginate(subscriptionPlan);

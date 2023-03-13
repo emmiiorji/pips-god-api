@@ -3,8 +3,15 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { transactionService } = require('../services');
+const validate = require('../middlewares/validate');
+const { initializeVipSignalsTransaction } = require('../validations/transaction.validation');
+const { subscriptionNames } = require('../config/subscriptionPlanNames');
 
 const initializeTransaction = catchAsync(async (req, res) => {
+  if (req.body.subscriptionPlanName === subscriptionNames.VIP_SIGNALS) {
+    const errorMessage = validate(initializeVipSignalsTransaction)(req, res);
+    if (errorMessage) throw new ApiError(httpStatus.BAD_REQUEST, errorMessage);
+  }
   const result = await transactionService.initializeTransaction(req.body);
   res.status(httpStatus.CREATED).send(result);
 });

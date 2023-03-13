@@ -100,7 +100,7 @@ const createUser = async (userBody) => {
     delete userCreated.dataValues.password;
     return userCreated;
   } catch (error) {
-    if (transaction) await transaction.rollback();
+    if (sequelizeTransaction) await sequelizeTransaction.rollback();
     logger.error(error);
   }
 };

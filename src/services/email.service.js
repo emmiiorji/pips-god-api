@@ -112,12 +112,27 @@ The Pipsgod Academy Team.`;
   await sendEmail(transaction.email, subject, text);
 };
 
+const sendVipSignalsEmail = async (transaction, subscriptionPlan) => {
+  const subject = 'Subscription Successful';
+
+  const text = `Hi ,
+
+Thank you for subscribing to the ${subscriptionPlan.title} plan on Pipsgod Academy. Here's the link to the telegram group for classes:
+
+${subscriptionPlan.telegramGroupUrl}
+
+Regards,
+The Pipsgod Academy Team.`;
+  await sendEmail(transaction.email, subject, text);
+};
+
 module.exports = {
   transport,
   sendEmail,
   sendResetPasswordEmail,
   sendVerificationEmail,
   sendRegistrationEmail,
+  sendVipSignalsEmail,
   resendVerificationEmail,
   confirmEmailVerification,
 };

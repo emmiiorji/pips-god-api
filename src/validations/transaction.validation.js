@@ -6,7 +6,22 @@ const initializeTransaction = {
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     subscriptionPlanName: Joi.string().required(),
+    firstName: Joi.string(),
+    lastName: Joi.string(),
+    middleName: Joi.string(),
+    telegramUsername: Joi.string(),
     // currency: Joi.string(),
+  }),
+};
+
+const initializeVipSignalsTransaction = {
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    subscriptionPlanName: Joi.string().required(),
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
+    middleName: Joi.string(),
+    telegramUsername: Joi.string().required(),
   }),
 };
 
@@ -42,4 +57,5 @@ module.exports = {
   getTransactions,
   verifyTransaction,
   getTransactionByReference,
+  initializeVipSignalsTransaction,
 };

@@ -1,16 +1,18 @@
 const logger = require('../config/logger');
+const { subscriptionNames } = require('../config/subscriptionPlanNames');
 const { db } = require('../models');
 
 const createDummySubscriptionPlans = async () => {
   const dummyPlans = [
     {
       title: 'VIP Signals',
-      name: 'vip_signals',
+      name: subscriptionNames.VIP_SIGNALS,
       price: '1000000',
+      telegramGroupUrl: 'https://t.me/examplegroup',
     },
     {
       title: 'Training and Mentoring',
-      name: 'training_and_mentoring',
+      name: subscriptionNames.TRAINING_AND_MENTORING,
       price: '1200000',
     },
   ];
