@@ -67,7 +67,7 @@ app.use(errorConverter);
 app.use(errorHandler);
 
 // intit DB
-db.sequelize.sync().then(() => {
+db.sequelize.sync({ force: true }).then(() => {
   createDummySubscriptionPlans();
   createDummyRoles();
 });
