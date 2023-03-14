@@ -15,7 +15,7 @@ const camelToCapitalized = (str) => {
   words = words ? [firstWord[0].slice(0, -1), ...words] : firstWord;
 
   for (let i = 0; i < words.length; i += 1) {
-    words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+    words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1).toLowerCase();
   }
 
   return words.join(' ');
@@ -41,8 +41,12 @@ const getPaystackCustomFields = (metadata) => {
 const initializeTransaction = async (transactionBody, isRenew = false) => {
   const { email, currency, subscriptionPlanName, ...metadata } = {
     email: transactionBody.email.toLowerCase(),
+    firstName: camelToCapitalized(transactionBody.firstName),
+    lastName: camelToCapitalized(transactionBody.lastName),
     ...transactionBody,
   };
+  if (transactionBody.middleName) metadata.middleName = camelToCapitalized(transactionBody.middleName);
+
   const isVipSignals = subscriptionPlanName === subscriptionNames.VIP_SIGNALS;
   const subscriptionPlan = await db.subscription_plans.findOne({
     where: { name: subscriptionPlanName },
