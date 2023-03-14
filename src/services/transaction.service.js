@@ -39,7 +39,10 @@ const getPaystackCustomFields = (metadata) => {
  * @returns {Promise<Object>}
  */
 const initializeTransaction = async (transactionBody, isRenew = false) => {
-  const { email, currency, subscriptionPlanName, ...metadata } = transactionBody;
+  const { email, currency, subscriptionPlanName, ...metadata } = {
+    email: transactionBody.email.toLowerCase(),
+    ...transactionBody,
+  };
   const isVipSignals = subscriptionPlanName === subscriptionNames.VIP_SIGNALS;
   const subscriptionPlan = await db.subscription_plans.findOne({
     where: { name: subscriptionPlanName },
@@ -48,10 +51,13 @@ const initializeTransaction = async (transactionBody, isRenew = false) => {
   if (!subscriptionPlan) throw new ApiError(httpStatus.NOT_FOUND, 'Subscription plan not found');
 
   if (isVipSignals) {
+    metadata.telegramUsername = metadata.telegramUsername.toLowerCase();
     const { telegramUsername } = metadata;
-    const user = await db.users.findOne({ where: { telegramUsername } });
+    let user = await db.users.findOne({ where: { telegramUsername } });
     if (user && !isRenew) throw new ApiError(httpStatus.ALREADY_REPORTED, 'User with telegram username already exists');
-    // return;
+
+    user = await db.users.findOne({ where: { email } });
+    if (user && !isRenew) throw new ApiError(httpStatus.ALREADY_REPORTED, 'User with email already exists');
   }
 
   const transactionId = nanoid();
