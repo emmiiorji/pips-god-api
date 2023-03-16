@@ -58,7 +58,7 @@ const initializeTransaction = async (transactionBody, isRenew = false) => {
     metadata.telegramUsername = metadata.telegramUsername.toLowerCase();
     const { telegramUsername } = metadata;
     let user = await db.users.findOne({ where: { telegramUsername } });
-    if (user && !isRenew) throw new ApiError(httpStatus.ALREADY_REPORTED, 'User with telegram username already exists');
+    if (user && !isRenew) throw new ApiError(httpStatus.IM_USED, 'User with telegram username already exists');
 
     user = await db.users.findOne({ where: { email } });
     if (user && !isRenew) throw new ApiError(httpStatus.ALREADY_REPORTED, 'User with email already exists');
