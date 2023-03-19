@@ -24,6 +24,16 @@ module.exports = (sequelize, dataType) => {
       type: dataType.STRING,
       trim: true,
     },
+    username: {
+      type: dataType.STRING,
+      trim: true,
+      unique: true,
+      validate(value) {
+        if (value.length < 3) {
+          throw new Error('Username must be at least 3 characters long');
+        }
+      },
+    },
     email: {
       type: dataType.STRING,
       allowNull: false,
