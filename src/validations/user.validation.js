@@ -8,8 +8,8 @@ const createUser = {
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
     middleName: Joi.string(),
-    role: Joi.string(),
-    transactionAccessCode: Joi.string().required(), // This has changed to transaction ID
+    role: Joi.string().trim().required(),
+    // transactionAccessCode: Joi.string().required(), // This has changed to transaction ID
   }),
 };
 

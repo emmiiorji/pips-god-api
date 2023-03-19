@@ -1,6 +1,7 @@
 const dotenv = require('dotenv');
 const path = require('path');
 const Joi = require('joi');
+const { checkSuperAdminUsers } = require('./superAdminUsers');
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
@@ -38,6 +39,8 @@ const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' }
 if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }
+
+const superAdminUsers = checkSuperAdminUsers();
 
 module.exports = {
   env: envVars.NODE_ENV,
@@ -81,4 +84,5 @@ module.exports = {
   bCrypt: {
     salt: envVars.BCRYPT_SALT,
   },
+  superAdminUsers,
 };

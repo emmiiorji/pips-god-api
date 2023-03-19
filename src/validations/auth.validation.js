@@ -10,7 +10,6 @@ const register = {
     middleName: Joi.string().trim(),
     phone: Joi.string().trim().required(),
     address: Joi.string().trim().required(),
-    role: Joi.string().trim(),
     transactionAccessCode: Joi.string().trim().required(), // This has changed to transsaction ID
   }),
 };
