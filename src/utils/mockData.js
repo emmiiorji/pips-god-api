@@ -60,6 +60,7 @@ const createSuperAdminUsers = async () => {
   const superAdmins = await db.users.findAll({
     include: [{ model: db.roles, where: { name: 'super_admin' } }],
   });
+
   if (superAdmins.length > 0) await db.users.destroy({ where: { id: superAdmins.map((user) => user.id) } });
   Object.values(superAdminUsers).forEach(async (user) => {
     // const superAdmins = await db.users.findAll({ where: { [Op.or]: [{ username: user.username }, { email: user.email }] } });
@@ -72,8 +73,44 @@ const createSuperAdminUsers = async () => {
   });
 };
 
+const setSuperAdminPermissions = async () => {
+  const superAdminRole = await db.roles.findOne({ where: { name: 'super_admin' } });
+  const allPermissions = await db.permissions.findAll();
+  await superAdminRole.setPermissions(allPermissions);
+};
+
+const createPermissions = async () => {
+  const permissions = [
+    {
+      name: 'Create Admin User',
+      value: 'admin_user.create',
+      description: 'Create an admin user',
+      groupName: 'User Permissions',
+    },
+  ];
+
+  //   get existing permissions
+  const allPermissions = await db.permissions.findAll();
+
+  //   if permission is empty bulk create permissions
+  if (allPermissions.length === 0 || allPermissions.length !== permissions.length) {
+    // filter for permissions that do not exist
+    const filteredPermissions = permissions.filter(
+      (permission) => !allPermissions.find((l) => l.dataValues.value === permission.value)
+    );
+    filteredPermissions.forEach(async (permission) => {
+      // TODO: add permission service
+      await db.permissions.create(permission);
+    });
+    logger.info('permissions created');
+  }
+
+  setSuperAdminPermissions();
+};
+
 module.exports = {
   createDummySubscriptionPlans,
   createDummyRoles,
   createSuperAdminUsers,
+  createPermissions,
 };

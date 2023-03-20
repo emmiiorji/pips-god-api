@@ -8,7 +8,18 @@ module.exports = (sequelize, dataType) => {
       trim: true,
       unique: true,
     },
+    value: {
+      type: dataType.STRING,
+      allowNull: false,
+      trim: true,
+      unique: true,
+    },
     description: {
+      type: dataType.STRING,
+      allowNull: false,
+      trim: true,
+    },
+    groupName: {
       type: dataType.STRING,
       allowNull: false,
       trim: true,

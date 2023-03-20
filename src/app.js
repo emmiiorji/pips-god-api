@@ -14,7 +14,12 @@ const routes = require('./routes/v1');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 const { db } = require('./models');
-const { createDummySubscriptionPlans, createDummyRoles, createSuperAdminUsers } = require('./utils/mockData');
+const {
+  createDummySubscriptionPlans,
+  createDummyRoles,
+  createSuperAdminUsers,
+  createPermissions,
+} = require('./utils/mockData');
 
 const app = express();
 
@@ -67,10 +72,11 @@ app.use(errorConverter);
 app.use(errorHandler);
 
 // intit DB
-db.sequelize.sync().then(() => {
+db.sequelize.sync({ force: true }).then(() => {
   createDummySubscriptionPlans();
   createDummyRoles();
   createSuperAdminUsers();
+  createPermissions();
 });
 
 module.exports = app;
