@@ -30,6 +30,13 @@ const checkSuperAdminUsers = () => {
       })
       .unknown();
 
+    superAdminUsers[index] = {};
+    superAdminUsers[index].username = process.env[`SUPER_ADMIN_USERNAME_${index}`];
+    superAdminUsers[index].email = process.env[`SUPER_ADMIN_EMAIL_${index}`];
+    superAdminUsers[index].firstName = process.env[`SUPER_ADMIN_FNAME_${index}`];
+    superAdminUsers[index].lastName = process.env[`SUPER_ADMIN_LNAME_${index}`];
+    superAdminUsers[index].password = process.env[`SUPER_ADMIN_PASSWORD_${index}`];
+
     const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' } }).validate(process.env);
     superAdminUsersEnvVars = { ...superAdminUsersEnvVars, ...envVars };
 

@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+const { superAdminUsers, bCrypt } = require('../config/config');
 const logger = require('../config/logger');
 const { subscriptionNames } = require('../config/subscriptionPlanNames');
 const { db } = require('../models');
@@ -38,7 +40,7 @@ const createDummyRoles = async () => {
       description: 'A normal user',
     },
     {
-      name: 'superuser',
+      name: 'super_admin',
       description: 'Admin of admins',
     },
   ];
@@ -54,7 +56,24 @@ const createDummyRoles = async () => {
   }
 };
 
+const createSuperAdminUsers = async () => {
+  const superAdmins = await db.users.findAll({
+    include: [{ model: db.roles, where: { name: 'super_admin' } }],
+  });
+  if (superAdmins.length > 0) await db.users.destroy({ where: { id: superAdmins.map((user) => user.id) } });
+  Object.values(superAdminUsers).forEach(async (user) => {
+    // const superAdmins = await db.users.findAll({ where: { [Op.or]: [{ username: user.username }, { email: user.email }] } });
+
+    // eslint-disable-next-line no-param-reassign
+    user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
+    const newUser = await db.users.create(user);
+    const superAdminRole = await db.roles.findOne({ where: { name: 'super_admin' } });
+    await newUser.addRole(superAdminRole);
+  });
+};
+
 module.exports = {
   createDummySubscriptionPlans,
   createDummyRoles,
+  createSuperAdminUsers,
 };
