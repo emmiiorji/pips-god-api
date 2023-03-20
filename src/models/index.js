@@ -55,8 +55,8 @@ db.users.hasMany(db.tokens);
 db.tokens.belongsTo(db.users, { foreignKey: { allowNull: false } });
 
 // role to permission
-db.users.belongsToMany(db.permissions, { through: 'role_permissions' });
-db.permissions.belongsToMany(db.users, { through: 'role_permissions' });
+db.roles.belongsToMany(db.permissions, { through: 'role_permissions' });
+db.permissions.belongsToMany(db.roles, { through: 'role_permissions' });
 
 // user to role m-m
 db.users.belongsToMany(db.roles, { through: 'user_roles' });
