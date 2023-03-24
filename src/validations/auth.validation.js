@@ -11,6 +11,25 @@ const register = {
     phone: Joi.string().trim().required(),
     address: Joi.string().trim().required(),
     transactionAccessCode: Joi.string().trim().required(), // This has changed to transsaction ID
+    role: Joi.string().trim(),
+    superAdminUsername: Joi.string().trim(),
+    superAdminPassword: Joi.string().trim(),
+  }),
+};
+
+const registerAdmin = {
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().custom(password),
+    firstName: Joi.string().trim().required(),
+    lastName: Joi.string().trim().required(),
+    middleName: Joi.string().trim(),
+    phone: Joi.string().trim().required(),
+    address: Joi.string().trim().required(),
+    transactionAccessCode: Joi.string().trim().required(), // This has changed to transsaction ID
+    role: Joi.string().trim(),
+    superAdminUsername: Joi.string().trim().required(),
+    superAdminPassword: Joi.string().trim().required(),
   }),
 };
 
@@ -66,4 +85,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   verifyEmail,
+  registerAdmin,
 };

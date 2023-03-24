@@ -5,6 +5,7 @@ const { db } = require('../models');
 const logger = require('../config/logger');
 const { bCrypt } = require('../config/config');
 const pick = require('../utils/pick');
+const { userService } = require('.');
 
 /**
  * Check if email is taken
@@ -47,6 +48,40 @@ const isPasswordMatch = async function (password, user) {
   const comp = bcrypt.compareSync(password, user.password);
   logger.info(comp);
   return comp;
+};
+
+const createAdminUser = async (userBody) => {
+  const { role, superAdminUsername, superAdminPassword, ...user } = userBody;
+  if (role === 'admin') {
+    const superAdminUser = await db.users.findOne({ where: { username: superAdminUsername }, include: db.roles });
+    if (!superAdminUser || !(await userService.isPasswordMatch(superAdminPassword, superAdminUser))) {
+      if (!superAdminUser.roles.find((userRole) => userRole.name === 'superadmin')) {
+        throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not a superadmin');
+      }
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect superadmin username or password');
+    }
+  }
+
+  if (await isEmailTaken(userBody.email)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
+  user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
+
+  let sequelizeTransaction;
+  try {
+    // Use a transaction to create the user and subscription
+    sequelizeTransaction = await db.sequelize.transaction();
+    const userCreated = await db.users.create(user, { transaction: sequelizeTransaction });
+
+    await userCreated.addRole('admin', { transaction: sequelizeTransaction });
+
+    await sequelizeTransaction.commit();
+    delete userCreated.dataValues.password;
+    return userCreated;
+  } catch (error) {
+    if (sequelizeTransaction) await sequelizeTransaction.rollback();
+    logger.error(error);
+  }
 };
 
 /**
@@ -202,6 +237,7 @@ const deleteUserById = async (userId) => {
 
 module.exports = {
   createUser,
+  createAdminUser,
   queryUsers,
   getUserById,
   getUserByEmail,
