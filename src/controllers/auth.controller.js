@@ -6,20 +6,21 @@ const { registerAdmin, registerUser } = require('../validations/auth.validation'
 const ApiError = require('../utils/ApiError');
 
 const register = catchAsync(async (req, res) => {
+  let user;
   if (req.body.role === 'super_admin') throw new ApiError(httpStatus.BAD_REQUEST, 'You cannot register as a super admin');
-  if (req.body.role !== 'user') {
+  if (req.body.role === 'admin') {
     const errorMessage = validate(registerAdmin)(req, res);
     if (errorMessage) throw new ApiError(httpStatus.UNAUTHORIZED, errorMessage);
+    user = await userService.createAdmin(req.body);
   } else {
     const errorMessage = validate(registerUser)(req, res);
     if (errorMessage) throw new ApiError(httpStatus.UNAUTHORIZED, errorMessage);
+    user = await userService.createUser(req.body);
+    const transactionId = req.body.transactionAccessCode;
+
+    const verifyEmailToken = await tokenService.generateVerifyEmailToken(user);
+    await emailService.sendVerificationEmail(user, verifyEmailToken, transactionId);
   }
-
-  const user = await userService.createUser(req.body);
-  const transactionId = req.body.transactionAccessCode;
-
-  const verifyEmailToken = await tokenService.generateVerifyEmailToken(user);
-  await emailService.sendVerificationEmail(user, verifyEmailToken, transactionId);
 
   res.status(httpStatus.CREATED).send({ message: 'Check your email for link to Verify your account', code: 201 });
 });

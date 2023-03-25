@@ -5,7 +5,7 @@ const { db } = require('../models');
 const logger = require('../config/logger');
 const { bCrypt } = require('../config/config');
 const pick = require('../utils/pick');
-const { userService } = require('.');
+const { userService, tokenService } = require('.');
 
 /**
  * Check if email is taken
@@ -77,7 +77,8 @@ const createAdminUser = async (userBody) => {
 
     await sequelizeTransaction.commit();
     delete userCreated.dataValues.password;
-    return userCreated;
+    const tokens = await tokenService.generateAuthTokens(userCreated.id);
+    return { userCreated, tokens };
   } catch (error) {
     if (sequelizeTransaction) await sequelizeTransaction.rollback();
     logger.error(error);
