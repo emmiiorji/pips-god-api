@@ -2,13 +2,16 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
 const validate = require('../middlewares/validate');
-const { registerAdmin } = require('../validations/auth.validation');
+const { registerAdmin, registerUser } = require('../validations/auth.validation');
 const ApiError = require('../utils/ApiError');
 
 const register = catchAsync(async (req, res) => {
   if (req.body.role === 'super_admin') throw new ApiError(httpStatus.BAD_REQUEST, 'You cannot register as a super admin');
   if (req.body.role !== 'user') {
     const errorMessage = validate(registerAdmin)(req, res);
+    if (errorMessage) throw new ApiError(httpStatus.UNAUTHORIZED, errorMessage);
+  } else {
+    const errorMessage = validate(registerUser)(req, res);
     if (errorMessage) throw new ApiError(httpStatus.UNAUTHORIZED, errorMessage);
   }
 
