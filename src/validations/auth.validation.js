@@ -37,10 +37,9 @@ const registerAdmin = {
     firstName: Joi.string().trim().required(),
     lastName: Joi.string().trim().required(),
     middleName: Joi.string().trim(),
-    phone: Joi.string().trim().required(),
-    address: Joi.string().trim().required(),
-    transactionAccessCode: Joi.string().trim().required(), // This has changed to transsaction ID
-    role: Joi.string().trim(),
+    phone: Joi.string().trim(),
+    address: Joi.string().trim(),
+    role: Joi.string().trim().required(),
     superAdminUsername: Joi.string().trim().required(),
     superAdminPassword: Joi.string().trim().required(),
   }),

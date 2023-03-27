@@ -11,7 +11,7 @@ const register = catchAsync(async (req, res) => {
   if (req.body.role === 'admin') {
     const errorMessage = validate(registerAdmin)(req, res);
     if (errorMessage) throw new ApiError(httpStatus.UNAUTHORIZED, errorMessage);
-    user = await userService.createAdmin(req.body);
+    user = await userService.createAdminUser(req.body);
   } else {
     const errorMessage = validate(registerUser)(req, res);
     if (errorMessage) throw new ApiError(httpStatus.UNAUTHORIZED, errorMessage);

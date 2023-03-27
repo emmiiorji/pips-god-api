@@ -5,7 +5,7 @@ const { db } = require('../models');
 const logger = require('../config/logger');
 const { bCrypt } = require('../config/config');
 const pick = require('../utils/pick');
-const { userService, tokenService } = require('.');
+const { generateAuthTokens } = require('./token.service');
 
 /**
  * Check if email is taken
@@ -54,7 +54,7 @@ const createAdminUser = async (userBody) => {
   const { role, superAdminUsername, superAdminPassword, ...user } = userBody;
   if (role === 'admin') {
     const superAdminUser = await db.users.findOne({ where: { username: superAdminUsername }, include: db.roles });
-    if (!superAdminUser || !(await userService.isPasswordMatch(superAdminPassword, superAdminUser))) {
+    if (!superAdminUser || !(await isPasswordMatch(superAdminPassword, superAdminUser))) {
       if (!superAdminUser.roles.find((userRole) => userRole.name === 'superadmin')) {
         throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not a superadmin');
       }
@@ -73,15 +73,18 @@ const createAdminUser = async (userBody) => {
     sequelizeTransaction = await db.sequelize.transaction();
     const userCreated = await db.users.create(user, { transaction: sequelizeTransaction });
 
-    await userCreated.addRole('admin', { transaction: sequelizeTransaction });
+    const adminRole = await db.roles.findOne({ where: { name: 'admin' } });
+    await userCreated.addRole(adminRole, { transaction: sequelizeTransaction });
 
-    await sequelizeTransaction.commit();
     delete userCreated.dataValues.password;
-    const tokens = await tokenService.generateAuthTokens(userCreated.id);
+    const tokens = await generateAuthTokens(userCreated.id);
+    await sequelizeTransaction.commit();
     return { userCreated, tokens };
   } catch (error) {
     if (sequelizeTransaction) await sequelizeTransaction.rollback();
     logger.error(error);
+
+    throw new ApiError();
   }
 };
 
