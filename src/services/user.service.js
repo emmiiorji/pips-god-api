@@ -52,14 +52,14 @@ const isPasswordMatch = async function (password, user) {
 
 const createAdminUser = async (userBody) => {
   const { role, superAdminUsername, superAdminPassword, ...user } = userBody;
-  if (role === 'admin') {
-    const superAdminUser = await db.users.findOne({ where: { username: superAdminUsername }, include: db.roles });
-    if (!superAdminUser || !(await isPasswordMatch(superAdminPassword, superAdminUser))) {
-      if (!superAdminUser.roles.find((userRole) => userRole.name === 'superadmin')) {
-        throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not a superadmin');
-      }
-      throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect superadmin username or password');
-    }
+  if (role !== 'admin') throw new ApiError(httpStatus.BAD_REQUEST, 'Registration must be for admin');
+
+  const superAdminUser = await db.users.findOne({ where: { username: superAdminUsername }, include: db.roles });
+  if (!superAdminUser || !(await isPasswordMatch(superAdminPassword, superAdminUser))) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect superadmin username or password');
+  }
+  if (!(await superAdminUser.roles.find((userRole) => userRole.name === 'superadmin'))) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not a superadmin');
   }
 
   if (await isEmailTaken(userBody.email)) {
