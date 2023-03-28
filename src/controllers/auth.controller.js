@@ -12,6 +12,7 @@ const register = catchAsync(async (req, res) => {
     const errorMessage = validate(registerAdmin)(req, res);
     if (errorMessage) throw new ApiError(httpStatus.UNAUTHORIZED, errorMessage);
     user = await userService.createAdminUser(req.body);
+    res.status(httpStatus.CREATED).send({ message: 'Admin User has been created', code: 201 });
   } else {
     const errorMessage = validate(registerUser)(req, res);
     if (errorMessage) throw new ApiError(httpStatus.UNAUTHORIZED, errorMessage);
@@ -20,9 +21,8 @@ const register = catchAsync(async (req, res) => {
 
     const verifyEmailToken = await tokenService.generateVerifyEmailToken(user);
     await emailService.sendVerificationEmail(user, verifyEmailToken, transactionId);
+    res.status(httpStatus.CREATED).send({ message: 'Check your email for link to Verify your account', code: 201 });
   }
-
-  res.status(httpStatus.CREATED).send({ message: 'Check your email for link to Verify your account', code: 201 });
 });
 
 const login = catchAsync(async (req, res) => {
