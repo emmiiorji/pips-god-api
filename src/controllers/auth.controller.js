@@ -11,8 +11,10 @@ const register = catchAsync(async (req, res) => {
   if (req.body.role === 'admin') {
     const errorMessage = validate(registerAdmin)(req, res);
     if (errorMessage) throw new ApiError(httpStatus.UNAUTHORIZED, errorMessage);
-    user = await userService.createAdminUser(req.body);
-    res.status(httpStatus.CREATED).send({ message: 'Admin User has been created', code: 201 });
+    const { userCreated, tokens } = await userService.createAdminUser(req.body);
+    res
+      .status(httpStatus.CREATED)
+      .send({ data: { user: userCreated, tokens }, message: 'Admin User has been created', code: 201 });
   } else {
     const errorMessage = validate(registerUser)(req, res);
     if (errorMessage) throw new ApiError(httpStatus.UNAUTHORIZED, errorMessage);
