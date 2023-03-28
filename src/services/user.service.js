@@ -67,25 +67,15 @@ const createAdminUser = async (userBody) => {
   }
   user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
 
-  let sequelizeTransaction;
-  try {
-    // Use a transaction to create the user and subscription
-    sequelizeTransaction = await db.sequelize.transaction();
-    const userCreated = await db.users.create(user, { transaction: sequelizeTransaction });
+  const userCreated = await db.users.create(user);
 
-    const adminRole = await db.roles.findOne({ where: { name: 'admin' } });
-    await userCreated.addRole(adminRole, { transaction: sequelizeTransaction });
+  const adminRole = await db.roles.findOne({ where: { name: 'admin' } });
+  await userCreated.addRole(adminRole);
 
-    delete userCreated.dataValues.password;
-    const tokens = await generateAuthTokens(userCreated.id);
-    await sequelizeTransaction.commit();
-    return { userCreated, tokens };
-  } catch (error) {
-    if (sequelizeTransaction) await sequelizeTransaction.rollback();
-    logger.error(error);
+  delete userCreated.dataValues.password;
+  const tokens = await generateAuthTokens(userCreated.id);
 
-    throw new ApiError();
-  }
+  return { userCreated, tokens };
 };
 
 /**
