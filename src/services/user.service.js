@@ -58,7 +58,7 @@ const createAdminUser = async (userBody) => {
   if (!superAdminUser || !(await isPasswordMatch(superAdminPassword, superAdminUser))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect superadmin username or password');
   }
-  if (!(await superAdminUser.roles.find((userRole) => userRole.name === 'superadmin'))) {
+  if (!superAdminUser.roles.find((userRole) => userRole.name === 'super_admin')) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not a superadmin');
   }
 
