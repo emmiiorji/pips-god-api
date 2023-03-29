@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const { Op } = require('sequelize');
 const { superAdminUsers, bCrypt } = require('../config/config');
 const logger = require('../config/logger');
 const { subscriptionNames } = require('../config/subscriptionPlanNames');
@@ -79,12 +80,24 @@ const setSuperAdminPermissions = async () => {
   await superAdminRole.setPermissions(allPermissions);
 };
 
+const setAdminPermissions = async () => {
+  const adminRole = await db.roles.findOne({ where: { name: 'admin' } });
+  const allPermissions = await db.permissions.findAll({ where: { value: { [Op.notLike]: 'admin_user.%' } } });
+  await adminRole.setPermissions(allPermissions);
+};
+
 const createPermissions = async () => {
   const permissions = [
     {
       name: 'Create Admin User',
       value: 'admin_user.create',
       description: 'Create an admin user',
+      groupName: 'User Permissions',
+    },
+    {
+      name: 'Manage Users',
+      value: 'users.manage',
+      description: 'Manage users',
       groupName: 'User Permissions',
     },
   ];
@@ -106,6 +119,7 @@ const createPermissions = async () => {
   }
 
   setSuperAdminPermissions();
+  setAdminPermissions();
 };
 
 module.exports = {
