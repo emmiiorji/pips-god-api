@@ -11,6 +11,10 @@ module.exports = (sequelize, dataType) => {
       type: dataType.BOOLEAN,
       defaultValue: false,
     },
+    isCompleted: {
+      type: dataType.BOOLEAN,
+      defaultValue: false,
+    },
   });
 
   sequelizePaginate.paginate(userCourse);
