@@ -34,10 +34,16 @@ const deleteUser = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+const getAdminDashboardStats = catchAsync(async (req, res) => {
+  const stats = await userService.getUsersDashboard(req.body);
+  res.send(stats);
+});
+
 module.exports = {
   createUser,
   getUsers,
   getUser,
   updateUser,
   deleteUser,
+  getAdminDashboardStats,
 };

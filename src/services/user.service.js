@@ -229,12 +229,57 @@ const deleteUserById = async (userId) => {
   return user;
 };
 
+const getUsersDashboard = async () => {
+  const usersByRoles = await db.users.findAll({
+    include: [
+      {
+        model: db.roles,
+        attributes: ['name'],
+      },
+    ],
+    attributes: [[db.sequelize.fn('COUNT', 'userId'), 'userCount']],
+    group: ['roleId'],
+  });
+
+  // ToDO: Create a job to monitor the validity of the subscription and update the isValid field
+  const usersByActivePlans = await db.users.findAll({
+    include: [
+      {
+        model: db.subscription_plans,
+        attributes: ['name', 'validity'],
+        through: {
+          model: db.subscriptions,
+          attributes: ['validity', 'isValid', 'userId'],
+          where: {
+            isValid: true,
+          },
+        },
+        required: true,
+      },
+    ],
+    attributes: [[db.sequelize.fn('COUNT', 'userId'), 'userCount']],
+    group: ['subscription_plans.id'],
+  });
+
+  const totalUsers = await db.users.count();
+
+  const totalActiveUsers = usersByActivePlans.reduce((acc, activePlan) => {
+    activePlan.subscription_plans.forEach((plan) => {
+      acc.add(plan.subscription.userId);
+    });
+    return acc;
+  }, new Set()).size;
+
+  return { usersByRoles, usersByActivePlans, totalActiveUsers, totalUsers };
+};
+
 module.exports = {
   createUser,
   createAdminUser,
   queryUsers,
   getUserById,
   getUserByEmail,
+  getUsersDashboard,
   updateUserById,
   deleteUserById,
   isPasswordMatch,

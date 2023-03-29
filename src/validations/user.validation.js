@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const moment = require('moment');
 const { password, objectId } = require('./custom.validation');
 
 const createUser = {
@@ -50,10 +51,18 @@ const deleteUser = {
   }),
 };
 
+const getAdminDashboardStats = {
+  body: Joi.object().keys({
+    startDate: Joi.string().default('2020-01-01'), // Arbitrary date
+    endDate: Joi.string().default(moment().format('YYYY-MM-DD')),
+  }),
+};
+
 module.exports = {
   createUser,
   getUsers,
   getUser,
+  getAdminDashboardStats,
   updateUser,
   deleteUser,
 };
