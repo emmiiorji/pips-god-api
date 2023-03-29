@@ -125,8 +125,6 @@ const verifyEmail = async (verifyEmailToken, transactionId) => {
     throw new Error();
   }
   await db.transactions.update({ isUsed: true }, { where: { id: subscription.transactionId } });
-  delete user.dataValues.password;
-  delete user.dataValues.otpSecret;
   return user;
 };
 
