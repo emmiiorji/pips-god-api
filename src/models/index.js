@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const { Op } = require('sequelize');
 const { sequelize } = require('../config/config');
 const logger = require('../config/logger');
 
@@ -26,6 +27,7 @@ sequelizeInstance
 
 db.sequelize = sequelizeInstance;
 db.Sequelize = Sequelize;
+db.Op = Op;
 
 db.users = require('./user.model')(sequelizeInstance, Sequelize);
 db.tokens = require('./token.model')(sequelizeInstance, Sequelize);

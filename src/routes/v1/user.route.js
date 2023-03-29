@@ -17,7 +17,7 @@ router
   .patch(auth('users.manage'), validate(userValidation.updateUser), userController.updateUser)
   .delete(auth('users.manage'), validate(userValidation.deleteUser), userController.deleteUser);
 
-router.route('/d/dashboard').get(userController.getAdminDashboardStats); // auth('users.manage'),
+router.route('/d/dashboard').get(validate(userValidation.getAdminDashboardStats), userController.getAdminDashboardStats); // auth('users.manage'),
 
 module.exports = router;
 

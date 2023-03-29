@@ -229,7 +229,8 @@ const deleteUserById = async (userId) => {
   return user;
 };
 
-const getUsersDashboard = async () => {
+const getUsersDashboard = async (reqBody) => {
+  const { startDate, endDate } = reqBody;
   const usersByRoles = await db.users.findAll({
     include: [
       {
@@ -237,7 +238,10 @@ const getUsersDashboard = async () => {
         attributes: ['name'],
       },
     ],
-    attributes: [[db.sequelize.fn('COUNT', 'userId'), 'userCount']],
+    where: {
+      createdAt: { [db.Op.between]: [startDate, db.Sequelize.literal(`DATE_ADD('${endDate}', INTERVAL 1 DAY)`)] },
+    },
+    attributes: ['createdAt', [db.Sequelize.fn('COUNT', 'userId'), 'userCount']],
     group: ['roleId'],
   });
 
@@ -257,11 +261,16 @@ const getUsersDashboard = async () => {
         required: true,
       },
     ],
-    attributes: [[db.sequelize.fn('COUNT', 'userId'), 'userCount']],
+    where: {
+      createdAt: { [db.Op.between]: [startDate, db.Sequelize.literal(`DATE_ADD('${endDate}', INTERVAL 1 DAY)`)] },
+    },
+    attributes: ['createdAt', [db.sequelize.fn('COUNT', 'userId'), 'userCount']],
     group: ['subscription_plans.id'],
   });
 
-  const totalUsers = await db.users.count();
+  const totalUsers = await db.users.count({
+    where: { createdAt: { [db.Op.between]: [startDate, db.Sequelize.literal(`DATE_ADD('${endDate}', INTERVAL 1 DAY)`)] } },
+  });
 
   const totalActiveUsers = usersByActivePlans.reduce((acc, activePlan) => {
     activePlan.subscription_plans.forEach((plan) => {

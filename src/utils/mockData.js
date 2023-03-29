@@ -1,5 +1,4 @@
 const bcrypt = require('bcryptjs');
-const { Op } = require('sequelize');
 const { superAdminUsers, bCrypt } = require('../config/config');
 const logger = require('../config/logger');
 const { subscriptionNames } = require('../config/subscriptionPlanNames');
@@ -64,7 +63,7 @@ const createSuperAdminUsers = async () => {
 
   if (superAdmins.length > 0) await db.users.destroy({ where: { id: superAdmins.map((user) => user.id) } });
   Object.values(superAdminUsers).forEach(async (user) => {
-    // const superAdmins = await db.users.findAll({ where: { [Op.or]: [{ username: user.username }, { email: user.email }] } });
+    // const superAdmins = await db.users.findAll({ where: { [db.Op.or]: [{ username: user.username }, { email: user.email }] } });
 
     // eslint-disable-next-line no-param-reassign
     user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
@@ -82,7 +81,7 @@ const setSuperAdminPermissions = async () => {
 
 const setAdminPermissions = async () => {
   const adminRole = await db.roles.findOne({ where: { name: 'admin' } });
-  const allPermissions = await db.permissions.findAll({ where: { value: { [Op.notLike]: 'admin_user.%' } } });
+  const allPermissions = await db.permissions.findAll({ where: { value: { [db.Op.notLike]: 'admin_user.%' } } });
   await adminRole.setPermissions(allPermissions);
 };
 
