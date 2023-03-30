@@ -66,6 +66,10 @@ module.exports = (sequelize, dataType) => {
       type: dataType.BOOLEAN,
       defaultValue: false,
     },
+    isActive: {
+      type: dataType.BOOLEAN,
+      defaultValue: true, // Set to false when user has no active subscription for up to 30 days
+    },
     otpSecret: {
       type: dataType.STRING,
       unique: true,

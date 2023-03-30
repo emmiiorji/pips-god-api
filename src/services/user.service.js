@@ -246,40 +246,50 @@ const getUsersDashboard = async (reqBody) => {
   });
 
   // ToDO: Create a job to monitor the validity of the subscription and update the isValid field
-  const usersByActivePlans = await db.users.findAll({
+  const usersAndPlans = await db.users.findAll({
     include: [
       {
         model: db.subscription_plans,
-        attributes: ['name', 'validity'],
+        attributes: ['name'],
         through: {
           model: db.subscriptions,
-          attributes: ['validity', 'isValid', 'userId'],
+          attributes: ['userId', 'validity', 'validityUnit', 'isValid', 'createdAt'],
           where: {
-            isValid: true,
+            createdAt: { [db.Op.between]: [startDate, db.Sequelize.literal(`DATE_ADD('${endDate}', INTERVAL 1 DAY)`)] },
           },
         },
         required: true,
       },
     ],
-    where: {
-      createdAt: { [db.Op.between]: [startDate, db.Sequelize.literal(`DATE_ADD('${endDate}', INTERVAL 1 DAY)`)] },
-    },
-    attributes: ['createdAt', [db.sequelize.fn('COUNT', 'userId'), 'userCount']],
-    group: ['subscription_plans.id'],
+    where: { isActive: true },
+    attributes: ['firstName', 'lastName', 'email', 'phone', 'createdAt'],
+    group: ['userId', 'subscriptionPlanId'],
   });
 
-  const totalUsers = await db.users.count({
-    where: { createdAt: { [db.Op.between]: [startDate, db.Sequelize.literal(`DATE_ADD('${endDate}', INTERVAL 1 DAY)`)] } },
-  });
+  // const completedMentorship = await db.users.findAll({});
 
-  const totalActiveUsers = usersByActivePlans.reduce((acc, activePlan) => {
-    activePlan.subscription_plans.forEach((plan) => {
-      acc.add(plan.subscription.userId);
-    });
-    return acc;
-  }, new Set()).size;
+  // TODO: Create a job to set a user as inactive
+  // if the user has no active subscription for up to 30days
+  const totalClientUsers = usersAndPlans.length;
 
-  return { usersByRoles, usersByActivePlans, totalActiveUsers, totalUsers };
+  const totalUsers = await db.users.count();
+
+  const totalInactiveUsers = await db.users.count({ where: { isActive: false } });
+
+  const totalActiveUsers = usersAndPlans.reduce(
+    (acc, plan) => acc + plan.subscription_plans.filter((sub) => sub.subscription.isValid).length,
+    0
+  );
+
+  return {
+    usersByRoles,
+    usersAndPlans,
+    totalActiveUsers,
+    totalInactiveUsers,
+    totalClientUsers,
+    totalUsers,
+    // completedMentorship,
+  };
 };
 
 module.exports = {
