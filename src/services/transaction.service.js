@@ -144,6 +144,7 @@ const verifyTransaction = async (transactionId, isRenew = false) => {
             transactionId: transaction.id,
             subscriptionPlanId: transaction.subscriptionPlanId,
             validity: subscriptionPlan.validity,
+            validityUnit: subscriptionPlan.validityUnit,
           },
           { transaction: sequelizeTransaction }
         );
