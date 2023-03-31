@@ -231,18 +231,22 @@ const deleteUserById = async (userId) => {
 
 const getUsersDashboard = async (reqBody) => {
   const { startDate, endDate } = reqBody;
-  const usersByRoles = await db.users.findAll({
+  let usersByRoles = await db.users.findAll({
     include: [
       {
         model: db.roles,
         attributes: ['name'],
+        required: true,
       },
     ],
     where: {
       createdAt: { [db.Op.between]: [startDate, db.Sequelize.literal(`DATE_ADD('${endDate}', INTERVAL 1 DAY)`)] },
     },
-    attributes: ['createdAt', [db.Sequelize.fn('COUNT', 'userId'), 'userCount']],
+    attributes: [[db.Sequelize.fn('COUNT', 'userId'), 'userCount']],
     group: ['roleId'],
+  });
+  usersByRoles = usersByRoles.map((role) => {
+    return { role: role.roles[0].name, userCount: role.dataValues.userCount };
   });
 
   // ToDO: Create a job to monitor the validity of the subscription and update the isValid field
@@ -262,11 +266,27 @@ const getUsersDashboard = async (reqBody) => {
       },
     ],
     where: { isActive: true },
-    attributes: ['firstName', 'lastName', 'email', 'phone', 'createdAt'],
+    attributes: ['createdAt'],
     group: ['userId', 'subscriptionPlanId'],
   });
 
-  // const completedMentorship = await db.users.findAll({});
+  // const usersAndCourses = await db.users.findAll({
+  //   include: [
+  //     {
+  //       model: db.courses,
+  //       attributes: ['name', 'id', 'sequenceNo'],
+  //       through: {
+  //         model: db.course_users,
+  //         attributes: ['userId', 'courseId', 'createdAt', 'isCompleted', 'completedAt'],
+  //       },
+  //       required: true,
+  //     },
+  //   ],
+  //   attributes: ['isActive', 'firstName', 'lastName', 'email', 'phone'],
+  //   group: ['userId', 'courseId'],
+  // });
+
+  // const completedMentorship = usersAndCourses.filter((user) => user.courses.filter((course) => course.course_users.isCompleted).length > 0););
 
   // TODO: Create a job to set a user as inactive
   // if the user has no active subscription for up to 30days
@@ -288,6 +308,7 @@ const getUsersDashboard = async (reqBody) => {
     totalInactiveUsers,
     totalClientUsers,
     totalUsers,
+    // usersAndCourses,
     // completedMentorship,
   };
 };
