@@ -39,15 +39,22 @@ const getPaystackCustomFields = (metadata) => {
  * @returns {Promise<Object>}
  */
 const initializeTransaction = async (transactionBody, isRenew = false) => {
+  const isVipSignals = transactionBody.subscriptionPlanName === subscriptionNames.VIP_SIGNALS;
+
+  let firstName;
+  let lastName;
+  if (isVipSignals) {
+    firstName = camelToCapitalized(transactionBody.firstName);
+    lastName = camelToCapitalized(transactionBody.lastName);
+  }
   const { email, currency, subscriptionPlanName, ...metadata } = {
-    email: transactionBody.email.toLowerCase(),
-    firstName: camelToCapitalized(transactionBody.firstName),
-    lastName: camelToCapitalized(transactionBody.lastName),
     ...transactionBody,
+    firstName,
+    lastName,
+    email: transactionBody.email.toLowerCase(),
   };
   if (transactionBody.middleName) metadata.middleName = camelToCapitalized(transactionBody.middleName);
 
-  const isVipSignals = subscriptionPlanName === subscriptionNames.VIP_SIGNALS;
   const subscriptionPlan = await db.subscription_plans.findOne({
     where: { name: subscriptionPlanName },
   });
