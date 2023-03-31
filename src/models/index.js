@@ -76,8 +76,8 @@ db.subscription_plans.belongsToMany(db.users, { through: db.subscriptions });
 // db.subscriptions.belongsTo(db.users);
 
 // subscription to user course 1-m
-db.user_courses.belongsTo(db.subscriptions, { foreignKey: { allowNull: false } });
-db.subscriptions.hasMany(db.user_courses);
+db.user_courses.hasMany(db.subscriptions, { foreignKey: 'subscriptionId' });
+db.subscriptions.hasOne(db.user_courses, { foreignKey: 'subscriptionId', allowNull: false });
 
 // subscription to transaction 1-1
 db.subscriptions.belongsTo(db.transactions);

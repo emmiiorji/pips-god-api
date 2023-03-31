@@ -3,7 +3,7 @@ const sequelizePaginate = require('sequelize-paginate');
 module.exports = (sequelize, dataType) => {
   const userCourse = sequelize.define('user_course', {
     startDate: {
-      type: dataType.STRING,
+      type: dataType.DATE,
       allowNull: false,
       trim: true,
     },
@@ -14,6 +14,16 @@ module.exports = (sequelize, dataType) => {
     isCompleted: {
       type: dataType.BOOLEAN,
       defaultValue: false,
+    },
+    completedAt: {
+      type: dataType.DATE,
+    },
+    subscriptionId: {
+      type: dataType.STRING,
+      references: {
+        model: 'subscriptions',
+        key: 'subscriptionId',
+      },
     },
   });
 
