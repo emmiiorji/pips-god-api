@@ -231,26 +231,26 @@ const deleteUserById = async (userId) => {
 
 const getUsersDashboard = async (reqBody) => {
   const { startDate, endDate } = reqBody;
-  let usersByRoles = await db.users.findAll({
-    include: [
-      {
-        model: db.roles,
-        attributes: ['name'],
-        required: true,
-      },
-    ],
-    where: {
-      createdAt: { [db.Op.between]: [startDate, db.Sequelize.literal(`DATE_ADD('${endDate}', INTERVAL 1 DAY)`)] },
-    },
-    attributes: [[db.Sequelize.fn('COUNT', 'userId'), 'userCount']],
-    group: ['roleId'],
-  });
-  usersByRoles = usersByRoles.map((role) => {
-    return { role: role.roles[0].name, userCount: role.dataValues.userCount };
-  });
+  // let usersByRoles = await db.users.findAll({
+  //   include: [
+  //     {
+  //       model: db.roles,
+  //       attributes: ['name'],
+  //       required: true,
+  //     },
+  //   ],
+  //   where: {
+  //     createdAt: { [db.Op.between]: [startDate, db.Sequelize.literal(`DATE_ADD('${endDate}', INTERVAL 1 DAY)`)] },
+  //   },
+  //   attributes: [[db.Sequelize.fn('COUNT', 'userId'), 'userCount']],
+  //   group: ['roleId'],
+  // });
+  // usersByRoles = usersByRoles.map((role) => {
+  //   return { role: role.roles[0].name, userCount: role.dataValues.userCount };
+  // });
 
   // ToDO: Create a job to monitor the validity of the subscription and update the isValid field
-  const usersAndPlans = await db.users.findAll({
+  const activeUsersAndPlans = await db.users.findAll({
     include: [
       {
         model: db.subscription_plans,
@@ -266,7 +266,7 @@ const getUsersDashboard = async (reqBody) => {
       },
     ],
     where: { isActive: true },
-    attributes: ['createdAt'],
+    attributes: ['firstName', 'lastName', 'createdAt'],
     group: ['userId', 'subscriptionPlanId'],
   });
 
@@ -290,24 +290,29 @@ const getUsersDashboard = async (reqBody) => {
 
   // TODO: Create a job to set a user as inactive
   // if the user has no active subscription for up to 30days
-  const totalClientUsers = usersAndPlans.length;
+  // const totalClientUsers = allUsersAndPlans.length;
 
-  const totalUsers = await db.users.count();
+  // const totalUsers = await db.users.count();
 
-  const totalInactiveUsers = await db.users.count({ where: { isActive: false } });
+  // const totalInactiveUsers = await db.users.count({ where: { isActive: false } });
 
-  const totalActiveUsers = usersAndPlans.reduce(
-    (acc, plan) => acc + plan.subscription_plans.filter((sub) => sub.subscription.isValid).length,
-    0
-  );
+  const totalActiveUsers = activeUsersAndPlans.reduce((acc, user) => {
+    user.subscription_plans.forEach((plan) => {
+      if (plan.subscription.isValid) {
+        if (!acc[plan.name]) acc[plan.name] = 0;
+        acc[plan.name] += 1;
+      }
+    });
+    return acc;
+  }, {});
 
   return {
-    usersByRoles,
-    usersAndPlans,
+    // usersByRoles,
+    activeUsersAndPlans,
     totalActiveUsers,
-    totalInactiveUsers,
-    totalClientUsers,
-    totalUsers,
+    // totalInactiveUsers,
+    // totalClientUsers,
+    // totalUsers,
     // usersAndCourses,
     // completedMentorship,
   };
