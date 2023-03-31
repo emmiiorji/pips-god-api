@@ -52,7 +52,7 @@ const deleteUser = {
 };
 
 const getAdminDashboardStats = {
-  body: Joi.object().keys({
+  query: Joi.object().keys({
     startDate: Joi.string().default('2020-01-01'), // Arbitrary date
     endDate: Joi.string().default(moment().format('YYYY-MM-DD')),
   }),

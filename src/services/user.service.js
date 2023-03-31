@@ -229,8 +229,8 @@ const deleteUserById = async (userId) => {
   return user;
 };
 
-const getUsersDashboard = async (reqBody) => {
-  const { startDate, endDate } = reqBody;
+const getUsersDashboard = async (reqQuery) => {
+  const { startDate, endDate } = reqQuery;
   // let usersByRoles = await db.users.findAll({
   //   include: [
   //     {

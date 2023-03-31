@@ -35,7 +35,7 @@ const deleteUser = catchAsync(async (req, res) => {
 });
 
 const getAdminDashboardStats = catchAsync(async (req, res) => {
-  const stats = await userService.getUsersDashboard(req.body);
+  const stats = await userService.getUsersDashboard(req.query);
   res.send(stats);
 });
 
