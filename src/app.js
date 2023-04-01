@@ -72,7 +72,7 @@ app.use(errorConverter);
 app.use(errorHandler);
 
 // init DB
-db.sequelize.sync({ force: true }).then(() => {
+db.sequelize.sync().then(() => {
   createDummySubscriptionPlans();
   createDummyRoles();
   createSuperAdminUsers();
