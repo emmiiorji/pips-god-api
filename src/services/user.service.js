@@ -275,6 +275,10 @@ const getUsersDashboard = async (reqQuery) => {
       {
         model: db.courses,
         attributes: ['name', 'id'],
+        include: {
+          model: db.subscription_plans,
+          attributes: ['name'],
+        },
         through: {
           model: db.course_users,
           attributes: ['userId', 'courseId', 'createdAt', 'isCompleted', 'completedAt'],
@@ -286,8 +290,26 @@ const getUsersDashboard = async (reqQuery) => {
     group: ['userId', 'courseId'],
   });
 
-  const completedMentorship = usersAndCourses.filter(
-    (user) => user.courses.filter((course) => course.course_users.isCompleted).length > 0
+  // const completedMentorship = usersAndCourses; // .filter(
+  //   (user) => user.courses.filter((course) => course.user_course.isCompleted).length > 0
+  // );
+
+  const completedTrainingAndMentoring = usersAndCourses.reduce(
+    (acc, user) => {
+      user.courses.forEach((course) => {
+        if (course.user_course.isCompleted) {
+          if (!acc.users[course.subscription_plan.name]) {
+            acc.users[course.subscription_plan.name] = [];
+          }
+          const { firstName, lastName, email, phone } = user;
+          const { completedAt } = course.user_course;
+          acc.users[course.subscription_plan.name].push({ firstName, lastName, email, phone, completedAt });
+          acc.total += 1;
+        }
+      });
+      return acc;
+    },
+    { total: 0, users: {} }
   );
 
   // TODO: Create a job to set a user as inactive
@@ -298,25 +320,30 @@ const getUsersDashboard = async (reqQuery) => {
 
   // const totalInactiveUsers = await db.users.count({ where: { isActive: false } });
 
-  const totalActiveUsers = activeUsersAndPlans.reduce((acc, user) => {
-    user.subscription_plans.forEach((plan) => {
-      if (plan.subscription.isValid) {
-        if (!acc[plan.name]) acc[plan.name] = 0;
-        acc[plan.name] += 1;
-      }
-    });
-    return acc;
-  }, {});
+  const activeUsers = activeUsersAndPlans.reduce(
+    (acc, user) => {
+      user.subscription_plans.forEach((plan) => {
+        if (plan.subscription.isValid) {
+          if (!acc[plan.name]) acc[plan.name] = 0;
+          acc[plan.name] += 1;
+          acc.total += 1;
+        }
+      });
+      return acc;
+    },
+    { total: 0 }
+  );
 
   return {
     // usersByRoles,
     activeUsersAndPlans,
-    totalActiveUsers,
+    activeUsers,
     // totalInactiveUsers,
     // totalClientUsers,
     // totalUsers,
     // usersAndCourses,
-    completedMentorship,
+    // completedMentorship,
+    completedTrainingAndMentoring,
   };
 };
 
