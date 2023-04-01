@@ -13,6 +13,11 @@ module.exports = (sequelize, dataType) => {
       allowNull: false,
       unique: true,
     },
+    url: {
+      type: dataType.STRING,
+      trim: true,
+      allowNull: false,
+    },
   });
 
   sequelizePaginate.paginate(CourseResource);

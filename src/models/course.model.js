@@ -13,15 +13,6 @@ module.exports = (sequelize, dataType) => {
       allowNull: false,
       unique: true,
     },
-    textMaterial: {
-      type: dataType.STRING,
-      defaultValue: false,
-    },
-    video: {
-      type: dataType.STRING,
-      allowNull: false,
-      trim: true,
-    },
     logo: {
       type: dataType.STRING,
       trim: true,
