@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { superAdminUsers, bCrypt } = require('../config/config');
 const logger = require('../config/logger');
-const { subscriptionNames } = require('../config/subscriptionPlanNames');
+const { subscriptionNames } = require('../config/constants');
 const { db } = require('../models');
 
 const createDummySubscriptionPlans = async () => {

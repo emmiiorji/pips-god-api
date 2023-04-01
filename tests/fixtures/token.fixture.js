@@ -1,6 +1,6 @@
 const moment = require('moment');
 const config = require('../../src/config/config');
-const { tokenTypes } = require('../../src/config/tokens');
+const { tokenTypes } = require('../../src/config/constants');
 const tokenService = require('../../src/services/token.service');
 const { userOne, admin } = require('./user.fixture');
 

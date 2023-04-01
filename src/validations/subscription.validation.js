@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { dateUnits } = require('../config/dateUnits');
+const { dateUnits } = require('../config/constants');
 
 const createSubscription = {
   body: Joi.object().keys({

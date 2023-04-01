@@ -1,5 +1,5 @@
 const sequelizePaginate = require('sequelize-paginate');
-const { dateUnits } = require('../config/dateUnits');
+const { dateUnits } = require('../config/constants');
 
 module.exports = (sequelize, dataType) => {
   const subscriptionPlan = sequelize.define('subscription_plan', {

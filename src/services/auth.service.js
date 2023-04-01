@@ -6,7 +6,7 @@ const tokenService = require('./token.service');
 const emailService = require('./email.service');
 const { db } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { tokenTypes } = require('../config/tokens');
+const { tokenTypes } = require('../config/constants');
 const { bCrypt } = require('../config/config');
 
 /**

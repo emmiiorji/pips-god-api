@@ -1,6 +1,6 @@
 const sequelizePaginate = require('sequelize-paginate');
 
-const { notificationStatusTypes } = require('../config/notificationStatuses');
+const { notificationStatusTypes } = require('../config/constants');
 
 module.exports = (sequelize, dataType) => {
   const notification = sequelize.define('notification', {

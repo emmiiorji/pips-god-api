@@ -1,6 +1,6 @@
 const { nanoid } = require('nanoid');
 const sequelizePaginate = require('sequelize-paginate');
-const { dateUnits } = require('../config/dateUnits');
+const { dateUnits } = require('../config/constants');
 
 module.exports = (sequelize, dataType) => {
   const subscription = sequelize.define('subscription', {

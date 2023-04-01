@@ -1,6 +1,6 @@
 const Joi = require('joi');
-const { dateUnits } = require('../config/dateUnits');
-const { transactionStatuses } = require('../config/transactionStatus');
+const { dateUnits } = require('../config/constants');
+const { transactionStatuses } = require('../config/constants');
 
 const initializeTransaction = {
   body: Joi.object().keys({

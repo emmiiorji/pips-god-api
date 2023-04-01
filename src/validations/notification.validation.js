@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { notificationStatusTypes } = require('../config/notificationStatuses');
+const { notificationStatusTypes } = require('../config/constants');
 
 const createNotification = {
   body: Joi.object().keys({

@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const { transactionService } = require('../services');
 const validate = require('../middlewares/validate');
 const { initializeVipSignalsTransaction } = require('../validations/transaction.validation');
-const { subscriptionNames } = require('../config/subscriptionPlanNames');
+const { subscriptionNames } = require('../config/constants');
 
 const initializeTransaction = catchAsync(async (req, res) => {
   if (req.body.subscriptionPlanName === subscriptionNames.VIP_SIGNALS) {

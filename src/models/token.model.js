@@ -1,4 +1,4 @@
-const { tokenTypes } = require('../config/tokens');
+const { tokenTypes } = require('../config/constants');
 
 module.exports = (sequelize, dataType) => {
   const token = sequelize.define('token', {

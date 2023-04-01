@@ -4,9 +4,9 @@ const paystack = require('paystack')(require('../config/config').paystack.secret
 const { client } = require('../config/config');
 const ApiError = require('../utils/ApiError');
 const { db } = require('../models');
-const { transactionStatuses } = require('../config/transactionStatus');
+const { transactionStatuses } = require('../config/constants');
 const { emailService } = require('.');
-const { subscriptionNames } = require('../config/subscriptionPlanNames');
+const { subscriptionNames } = require('../config/constants');
 const logger = require('../config/logger');
 
 const camelToCapitalized = (str) => {
