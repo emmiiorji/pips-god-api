@@ -270,23 +270,25 @@ const getUsersDashboard = async (reqQuery) => {
     group: ['userId', 'subscriptionPlanId'],
   });
 
-  // const usersAndCourses = await db.users.findAll({
-  //   include: [
-  //     {
-  //       model: db.courses,
-  //       attributes: ['name', 'id', 'sequenceNo'],
-  //       through: {
-  //         model: db.course_users,
-  //         attributes: ['userId', 'courseId', 'createdAt', 'isCompleted', 'completedAt'],
-  //       },
-  //       required: true,
-  //     },
-  //   ],
-  //   attributes: ['isActive', 'firstName', 'lastName', 'email', 'phone'],
-  //   group: ['userId', 'courseId'],
-  // });
+  const usersAndCourses = await db.users.findAll({
+    include: [
+      {
+        model: db.courses,
+        attributes: ['name', 'id', 'sequenceNo'],
+        through: {
+          model: db.course_users,
+          attributes: ['userId', 'courseId', 'createdAt', 'isCompleted', 'completedAt'],
+        },
+        required: true,
+      },
+    ],
+    attributes: ['isActive', 'firstName', 'lastName', 'email', 'phone'],
+    group: ['userId', 'courseId'],
+  });
 
-  // const completedMentorship = usersAndCourses.filter((user) => user.courses.filter((course) => course.course_users.isCompleted).length > 0););
+  const completedMentorship = usersAndCourses.filter(
+    (user) => user.courses.filter((course) => course.course_users.isCompleted).length > 0
+  );
 
   // TODO: Create a job to set a user as inactive
   // if the user has no active subscription for up to 30days
@@ -314,7 +316,7 @@ const getUsersDashboard = async (reqQuery) => {
     // totalClientUsers,
     // totalUsers,
     // usersAndCourses,
-    // completedMentorship,
+    completedMentorship,
   };
 };
 
