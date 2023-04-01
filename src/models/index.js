@@ -43,6 +43,8 @@ db.notifications = require('./notification.model')(sequelizeInstance, Sequelize)
 db.message_templates = require('./message_template.model')(sequelizeInstance, Sequelize);
 db.message_variables = require('./variable.model')(sequelizeInstance, Sequelize);
 db.course_resources = require('./course_resource.model')(sequelizeInstance, Sequelize);
+db.user_course_resources = require('./user_course_resource.model')(sequelizeInstance, Sequelize);
+db.resource_titles = require('./resource_title.model')(sequelizeInstance, Sequelize);
 
 // relationships for models
 
@@ -80,9 +82,13 @@ db.subscription_plans.belongsToMany(db.users, { through: db.subscriptions });
 db.courses.hasMany(db.course_resources);
 db.course_resources.belongsTo(db.courses);
 
-// user_course to resource 1-1
-db.user_courses.belongsTo(db.course_resources, { foreignKey: 'lastCompletedResourceId' });
-db.course_resources.hasOne(db.user_courses, { foreignKey: 'lastCompletedResourceId' });
+// user to subscription plan m-m
+db.users.belongsToMany(db.course_resources, { through: db.user_course_resources });
+db.course_resources.belongsToMany(db.users, { through: db.user_course_resources });
+
+// resource_title to course_resource 1-m
+db.resource_titles.hasMany(db.course_resources);
+db.course_resources.belongsTo(db.resource_titles);
 
 // course to subscription_plan 1-1
 db.courses.belongsTo(db.subscription_plans);

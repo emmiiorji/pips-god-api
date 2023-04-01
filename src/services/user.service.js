@@ -274,7 +274,7 @@ const getUsersDashboard = async (reqQuery) => {
     include: [
       {
         model: db.courses,
-        attributes: ['name', 'id', 'sequenceNo'],
+        attributes: ['name', 'id'],
         through: {
           model: db.course_users,
           attributes: ['userId', 'courseId', 'createdAt', 'isCompleted', 'completedAt'],

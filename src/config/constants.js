@@ -1,6 +1,7 @@
 const resourceTypes = {
   TEXT: 'text',
   VIDEO: 'video',
+  IMAGE: 'image',
 };
 
 const dateUnits = {

@@ -8,12 +8,15 @@ module.exports = (sequelize, dataType) => {
       trim: true,
       unique: true,
     },
-    sequenceNo: {
-      type: dataType.INTEGER,
-      allowNull: false,
-      unique: true,
+    description: {
+      type: dataType.TEXT,
+      trim: true,
     },
     logo: {
+      type: dataType.STRING,
+      trim: true,
+    },
+    thumbnail: {
       type: dataType.STRING,
       trim: true,
     },

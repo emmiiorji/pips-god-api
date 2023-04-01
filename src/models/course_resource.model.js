@@ -8,6 +8,10 @@ module.exports = (sequelize, dataType) => {
       allowNull: false,
       trim: true,
     },
+    description: {
+      type: dataType.STRING,
+      trim: true,
+    },
     sequenceNo: {
       type: dataType.INTEGER,
       allowNull: false,
@@ -16,7 +20,14 @@ module.exports = (sequelize, dataType) => {
     url: {
       type: dataType.STRING,
       trim: true,
-      allowNull: false,
+    },
+    text: {
+      type: dataType.TEXT,
+      trim: true,
+    },
+    thumbnail: {
+      type: dataType.STRING,
+      trim: true,
     },
   });
 
