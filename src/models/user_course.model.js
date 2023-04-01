@@ -18,13 +18,6 @@ module.exports = (sequelize, dataType) => {
     completedAt: {
       type: dataType.DATE,
     },
-    subscriptionId: {
-      type: dataType.STRING,
-      references: {
-        model: 'subscriptions',
-        key: 'subscriptionId',
-      },
-    },
   });
 
   sequelizePaginate.paginate(userCourse);
