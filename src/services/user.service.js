@@ -182,19 +182,18 @@ const getUserById = async (id) => {
  * @param {string} email
  * @returns {Promise<User>}
  */
-const getUserByEmail = async (email) => {
-  return filterUser(
-    await db.users.findOne({
-      where: { email },
-      include: {
-        model: db.roles,
-        as: 'roles',
-        attributes: ['name'],
-        through: { attributes: [] },
-      },
-    })
-  );
-};
+async function getUserByEmail(email) {
+  return db.users.findOne({
+    where: { email },
+    attributes: { exclude: ['password'] },
+    include: {
+      model: db.roles,
+      as: 'roles',
+      attributes: ['name'],
+      through: { attributes: [] },
+    },
+  });
+}
 
 /**
  * Update user by id

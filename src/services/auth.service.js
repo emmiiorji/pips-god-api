@@ -93,6 +93,11 @@ const verifyEmail = async (verifyEmailToken, transactionId) => {
     const verifyEmailTokenDoc = await tokenService.verifyToken(verifyEmailToken, tokenTypes.VERIFY_EMAIL);
     user = await userService.getUserById(verifyEmailTokenDoc.userId);
   } catch (error) {
+    if (transaction) {
+      if (transaction.isUsed) {
+        throw new ApiError(httpStatus.ALREADY_REPORTED, 'Email already verified');
+      }
+    }
     if (transaction && !transaction.isUsed) {
       const subscription = await db.subscriptions.findOne({ where: { transactionId } });
       user = await db.users.findOne({ where: { id: subscription.userId } });

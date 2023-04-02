@@ -3,10 +3,23 @@ const moment = require('moment');
 const httpStatus = require('http-status');
 const speakeasy = require('speakeasy');
 const config = require('../config/config');
-const userService = require('./user.service');
 const { db } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/constants');
+// const { getUserByEmail } = require('./user.service');
+
+const getUserByEmail = async (email) => {
+  return db.users.findOne({
+    where: { email },
+    attributes: { exclude: ['password'] },
+    include: {
+      model: db.roles,
+      as: 'roles',
+      attributes: ['name'],
+      through: { attributes: [] },
+    },
+  });
+};
 
 /**
  * Generate token
@@ -108,7 +121,7 @@ const generateAuthTokens = async (user) => {
  * @returns {Promise<string>}
  */
 const generateResetPasswordToken = async (email) => {
-  const user = await userService.getUserByEmail(email);
+  const user = await getUserByEmail(email);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
   }
@@ -128,7 +141,8 @@ const generateOTP = (secret) => {
 };
 
 const generateResetPasswordOTP = async (email) => {
-  const user = await userService.getUserByEmail(email);
+  const user = await getUserByEmail(email);
+
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
   }
