@@ -275,10 +275,7 @@ const getUsersDashboard = async (reqQuery) => {
       {
         model: db.courses,
         attributes: ['name', 'id'],
-        include: {
-          model: db.subscription_plans,
-          attributes: ['name'],
-        },
+        include: { model: db.subscription_plans, attributes: ['name', 'id'] },
         through: {
           model: db.course_users,
           attributes: ['userId', 'courseId', 'createdAt', 'isCompleted', 'completedAt'],
@@ -290,7 +287,24 @@ const getUsersDashboard = async (reqQuery) => {
     group: ['userId', 'courseId'],
   });
 
-  // const completedMentorship = usersAndCourses; // .filter(
+  const subscriptions = await db.subscriptions.findAll({
+    include: [
+      { model: db.subscription_plans, attributes: ['name'] },
+      { model: db.transactions, attributes: ['amount'] },
+    ],
+  });
+  const userPlanAmounts = subscriptions.reduce((acc, sub) => {
+    if (!acc[`${sub.userId} ${sub.subscription_plan.name}`]) {
+      acc[`${sub.userId} ${sub.subscription_plan.name}`] = {};
+      acc[`${sub.userId} ${sub.subscription_plan.name}`].amounts = [];
+    }
+    acc[`${sub.userId} ${sub.subscription_plan.name}`].amounts.push(sub.transaction.amount);
+    return acc;
+  }, {});
+
+  // console.log(userPlanAmounts);
+
+  // const completedMentorship = userPlanAmounts; // .filter(
   //   (user) => user.courses.filter((course) => course.user_course.isCompleted).length > 0
   // );
 
@@ -303,7 +317,12 @@ const getUsersDashboard = async (reqQuery) => {
           }
           const { firstName, lastName, email, phone } = user;
           const { completedAt } = course.user_course;
-          acc.users[course.subscription_plan.name].push({ firstName, lastName, email, phone, completedAt });
+          let totalAmountPaid = 0;
+          totalAmountPaid = userPlanAmounts[`${course.user_course.userId} ${course.subscription_plan.name}`].amounts.reduce(
+            (a, b) => a + b,
+            0
+          );
+          acc.users[course.subscription_plan.name].push({ firstName, lastName, email, phone, completedAt, totalAmountPaid });
           acc.total += 1;
         }
       });

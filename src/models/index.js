@@ -76,7 +76,7 @@ db.users.belongsToMany(db.subscription_plans, { through: db.subscriptions });
 db.subscription_plans.belongsToMany(db.users, { through: db.subscriptions });
 
 // user to subscription 1-m
-// db.subscriptions.belongsTo(db.users);
+db.subscriptions.belongsTo(db.subscription_plans, { foreignKey: { allowNull: false } });
 
 // course to resource 1-m
 db.courses.hasMany(db.course_resources);
