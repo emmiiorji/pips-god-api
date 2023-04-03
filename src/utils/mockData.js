@@ -4,8 +4,8 @@ const logger = require('../config/logger');
 const { subscriptionNames } = require('../config/constants');
 const { db } = require('../models');
 
-const createDummySubscriptionPlans = async () => {
-  const dummyPlans = [
+const createSeedSubscriptionPlans = async () => {
+  const seedPlans = [
     {
       title: 'VIP Signals',
       name: subscriptionNames.VIP_SIGNALS,
@@ -22,15 +22,15 @@ const createDummySubscriptionPlans = async () => {
   // Get existing plans
   const allPlans = await db.subscription_plans.findAll();
 
-  // Create the plans in dummyPlans that don't exist
-  if (allPlans.length === 0 || allPlans.length !== dummyPlans.length) {
-    const filteredPlans = dummyPlans.filter((plan) => !allPlans.find((p) => p.name === plan.name));
+  // Create the plans in seedPlans that don't exist
+  if (allPlans.length === 0 || allPlans.length !== seedPlans.length) {
+    const filteredPlans = seedPlans.filter((plan) => !allPlans.find((p) => p.name === plan.name));
     await db.subscription_plans.bulkCreate(filteredPlans);
-    logger.info('Created dummy subscription plans');
+    logger.info('Created seed subscription plans');
   }
 };
-const createDummyRoles = async () => {
-  const dummyRoles = [
+const createSeedRoles = async () => {
+  const seedRoles = [
     {
       name: 'admin',
       description: 'An admin user',
@@ -48,11 +48,11 @@ const createDummyRoles = async () => {
   // Get existing plans
   const allRoles = await db.roles.findAll();
 
-  // Create the plans in dummyPlans that don't exist
-  if (allRoles.length === 0 || allRoles.length !== dummyRoles.length) {
-    const filteredRoles = dummyRoles.filter((role) => !allRoles.find((r) => r.name === role.name));
+  // Create the plans in seedPlans that don't exist
+  if (allRoles.length === 0 || allRoles.length !== seedRoles.length) {
+    const filteredRoles = seedRoles.filter((role) => !allRoles.find((r) => r.name === role.name));
     await db.roles.bulkCreate(filteredRoles);
-    logger.info('Created dummy roles');
+    logger.info('Created Seed roles');
   }
 };
 
@@ -121,9 +121,32 @@ const createPermissions = async () => {
   setAdminPermissions();
 };
 
+const createSeedCourses = async () => {
+  const trainingAndMentoringCourse = {
+    name: subscriptionNames.TRAINING_AND_MENTORING,
+    description: 'Learn how to trade forex',
+    tags: 'forex, trading',
+  };
+
+  const trainingAndMentoring = await db.courses.findOne({
+    where: { name: subscriptionNames.TRAINING_AND_MENTORING },
+  });
+  const trainingSubscription = await db.subscription_plans.findOne({
+    where: { name: subscriptionNames.TRAINING_AND_MENTORING },
+  });
+  if (!trainingAndMentoring) {
+    if (trainingSubscription) {
+      trainingAndMentoringCourse.subscriptionPlanId = trainingSubscription.id;
+      await db.courses.create(trainingAndMentoringCourse);
+    }
+  }
+  logger.info('Training and Mentoring course created');
+};
+
 module.exports = {
-  createDummySubscriptionPlans,
-  createDummyRoles,
+  createSeedSubscriptionPlans,
+  createSeedRoles,
   createSuperAdminUsers,
   createPermissions,
+  createSeedCourses,
 };

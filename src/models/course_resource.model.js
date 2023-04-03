@@ -3,6 +3,14 @@ const { resourceTypes } = require('../config/constants');
 
 module.exports = (sequelize, dataType) => {
   const CourseResource = sequelize.define('course_resource', {
+    courseId: {
+      type: dataType.INTEGER,
+      allowNull: false,
+    },
+    courseModuleId: {
+      type: dataType.INTEGER,
+      allowNull: false,
+    },
     type: {
       type: dataType.ENUM(...Object.values(resourceTypes)),
       allowNull: false,
@@ -12,17 +20,8 @@ module.exports = (sequelize, dataType) => {
       type: dataType.STRING,
       trim: true,
     },
-    sequenceNo: {
-      type: dataType.INTEGER,
-      allowNull: false,
-      unique: true,
-    },
     url: {
       type: dataType.STRING,
-      trim: true,
-    },
-    text: {
-      type: dataType.TEXT,
       trim: true,
     },
     thumbnail: {

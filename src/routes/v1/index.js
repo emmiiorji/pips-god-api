@@ -5,6 +5,7 @@ const transactionRoute = require('./transaction.route');
 const docsRoute = require('./docs.route');
 const config = require('../../config/config');
 const notificationRoute = require('./notification.route');
+const courseModuleRoute = require('./course_module.route');
 
 const router = express.Router();
 
@@ -24,6 +25,10 @@ const defaultRoutes = [
   {
     path: '/notifications',
     route: notificationRoute,
+  },
+  {
+    path: '/course_modules',
+    route: courseModuleRoute,
   },
 ];
 

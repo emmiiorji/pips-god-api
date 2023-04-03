@@ -124,10 +124,10 @@ const createUser = async (userBody) => {
 const queryUsers = async (filter, options) => {
   if (options.sortBy !== undefined) {
     const [sortBy, direction] = options.sortBy.split(':');
-    if (Object.keys(db.transactions.rawAttributes).includes(sortBy)) {
+    if (!Object.keys(db.users.rawAttributes).includes(sortBy)) {
       throw new ApiError(httpStatus.BAD_REQUEST, `Invalid column name for user`);
     }
-    if (['asc', 'desc'].includes(direction.toLowerCase())) {
+    if (!['asc', 'desc'].includes(direction.toLowerCase())) {
       throw new ApiError(httpStatus.BAD_REQUEST, `Invalid order`);
     }
 

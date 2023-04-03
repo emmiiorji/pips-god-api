@@ -44,7 +44,7 @@ db.message_templates = require('./message_template.model')(sequelizeInstance, Se
 db.message_variables = require('./variable.model')(sequelizeInstance, Sequelize);
 db.course_resources = require('./course_resource.model')(sequelizeInstance, Sequelize);
 db.user_course_resources = require('./user_course_resource.model')(sequelizeInstance, Sequelize);
-db.resource_titles = require('./resource_title.model')(sequelizeInstance, Sequelize);
+db.course_modules = require('./course_module.model')(sequelizeInstance, Sequelize);
 
 // relationships for models
 
@@ -86,9 +86,13 @@ db.course_resources.belongsTo(db.courses);
 db.users.belongsToMany(db.course_resources, { through: db.user_course_resources });
 db.course_resources.belongsToMany(db.users, { through: db.user_course_resources });
 
-// resource_title to course_resource 1-m
-db.resource_titles.hasMany(db.course_resources);
-db.course_resources.belongsTo(db.resource_titles);
+// course to course_resource 1-m
+db.courses.hasMany(db.course_resources);
+db.course_resources.belongsTo(db.courses);
+
+// course_module to course_resource 1-m
+db.course_modules.hasMany(db.course_resources);
+db.course_resources.belongsTo(db.course_modules);
 
 // course to subscription_plan 1-1
 db.courses.belongsTo(db.subscription_plans);

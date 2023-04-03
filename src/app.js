@@ -15,10 +15,11 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 const { db } = require('./models');
 const {
-  createDummySubscriptionPlans,
-  createDummyRoles,
+  createSeedSubscriptionPlans,
+  createSeedRoles,
   createSuperAdminUsers,
   createPermissions,
+  createSeedCourses,
 } = require('./utils/mockData');
 
 const app = express();
@@ -73,10 +74,11 @@ app.use(errorHandler);
 
 // init DB
 db.sequelize.sync().then(() => {
-  createDummySubscriptionPlans();
-  createDummyRoles();
+  createSeedSubscriptionPlans();
+  createSeedRoles();
   createSuperAdminUsers();
   createPermissions();
+  createSeedCourses();
 });
 
 module.exports = app;
