@@ -9,7 +9,6 @@ const createCourseModule = {
         title: Joi.string().required(),
         tags: Joi.string().required(),
         logo: Joi.string(),
-        sequenceNo: Joi.number().integer().required(),
         thumbnail: Joi.string(),
         courseId: Joi.number().integer().required(),
       })
