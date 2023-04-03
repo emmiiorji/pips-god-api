@@ -5,7 +5,7 @@ const createCourseModule = {
   body: Joi.object().keys({
     courseModule: Joi.object()
       .keys({
-        description: Joi.string().required(),
+        description: Joi.string(),
         title: Joi.string().required(),
         tags: Joi.string().required(),
         logo: Joi.string(),
