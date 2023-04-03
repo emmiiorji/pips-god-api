@@ -71,10 +71,10 @@ const queryCourseModules = async (filter, options) => {
     // eslint-disable-next-line no-param-reassign
     options.order = [[options.sortBy, options.direction]];
   }
-  const courseResources = await db.course_resources.paginate({
+  const courseResources = await db.course_modules.paginate({
     where: filter,
     ...options,
-    include: { model: db.course_modules, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+    include: { model: db.course_resources, attributes: { exclude: ['createdAt', 'updatedAt'] } },
     attributes: { exclude: ['createdAt', 'updatedAt'] },
   }); // .paginate(filter, options);
   return courseResources;
