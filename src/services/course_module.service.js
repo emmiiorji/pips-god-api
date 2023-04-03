@@ -10,14 +10,11 @@ const createCourseModule = async (courseResourceBody) => {
   const featuredCourse = await db.courses.findByPk(courseModule.courseId);
 
   if (!featuredCourse) {
-    throw new ApiError(httpStatus.BAD_REQUEST, { message: 'Course not found', code: 'COURSE_NOT_FOUND' });
+    throw new ApiError(httpStatus.NOT_FOUND, 'COURSE_NOT_FOUND');
   }
   const existingCourseModuleTitle = await db.course_modules.findOne({ where: { title: courseModule.title } });
   if (existingCourseModuleTitle) {
-    throw new ApiError(httpStatus.BAD_REQUEST, {
-      message: 'Course Module title already exists',
-      code: 'COURSE_MODULE_TITLE_EXISTS',
-    });
+    throw new ApiError(httpStatus.ALREADY_REPORTED, 'COURE_MODULE_TITLE_ALREADY_EXISTS');
   }
 
   const sequelizeTransaction = await db.sequelize.transaction();
@@ -26,12 +23,9 @@ const createCourseModule = async (courseResourceBody) => {
     const createdCourseResources = await db.course_resources.bulkCreate(
       courseResources.map((courseResource) => {
         if (courseResource.type === resourceTypes.VIDEO) {
-          if (courseResource.thumbail === undefined) {
+          if (courseResource.thumbnail === undefined) {
             // eslint-disable-next-line no-throw-literal
-            throw {
-              message: 'Video thumbail is required',
-              code: 'VIDEO_THUMBNAIL_REQUIRED',
-            };
+            throw 'VIDEO_THUMBNAIL_REQUIRED';
           }
         }
         return {
@@ -48,8 +42,8 @@ const createCourseModule = async (courseResourceBody) => {
   } catch (error) {
     await sequelizeTransaction.rollback();
     logger.error(error);
-    if (error.code !== 'VIDEO_THUMBNAIL_REQUIRED') {
-      throw new ApiError(httpStatus.BAD_REQUEST, error.code);
+    if (error === 'VIDEO_THUMBNAIL_REQUIRED') {
+      throw new ApiError(httpStatus.BAD_REQUEST, error);
     }
     throw new ApiError(httpStatus.BAD_REQUEST, 'Error creating course resource');
   }
