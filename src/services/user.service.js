@@ -4,7 +4,6 @@ const ApiError = require('../utils/ApiError');
 const { db } = require('../models');
 const logger = require('../config/logger');
 const { bCrypt } = require('../config/config');
-const pick = require('../utils/pick');
 const { generateAuthTokens } = require('./token.service');
 
 /**
@@ -16,27 +15,6 @@ const isEmailTaken = async function (email) {
   const user = await db.users.findOne({ where: { email } });
   logger.info(user);
   return !!user;
-};
-
-const removePassword = (user) => {
-  if (typeof user === 'object' && user !== null && !Array.isArray(user)) {
-    return pick(
-      user.dataValues,
-      Object.keys(user.dataValues).filter((key) => !['password', 'otpSecret'].includes(key))
-    );
-  }
-  return user;
-};
-
-const filterUser = (user) => {
-  const newUser = {
-    ...user,
-    dataValues: {
-      ...user.dataValues,
-      roles: user.roles.map((role) => pick(role.dataValues, ['name'])),
-    },
-  };
-  return removePassword(newUser);
 };
 
 /**
@@ -159,12 +137,13 @@ const queryUsers = async (filter, options) => {
   const users = await db.users.paginate({
     where: filter,
     ...options,
-    include: db.roles,
+    include: {
+      model: db.roles,
+      attributes: ['name'],
+    },
+    attributes: { exclude: ['password', 'otpSecret'] },
   }); // .paginate(filter, options);
-  return {
-    ...users,
-    docs: users.docs.map((user) => filterUser(user)),
-  };
+  return users;
 };
 
 /**
@@ -173,8 +152,8 @@ const queryUsers = async (filter, options) => {
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  const user = await db.users.findByPk(id, { include: db.roles });
-  return filterUser(user);
+  const user = await db.users.findByPk(id, { include: { model: db.roles, attributes: ['name'] } });
+  return user;
 };
 
 /**
