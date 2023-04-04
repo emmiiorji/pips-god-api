@@ -1,6 +1,8 @@
 const nodemailer = require('nodemailer');
 const config = require('../config/config');
 const logger = require('../config/logger');
+const { sendOtpEmailTemplate, sendVerificationEmailTemplate } = require('../public/javascripts/mails');
+const confirmEmailVerificationTemplate = require('../public/javascripts/mails/confirmEmailVerificationTemplate');
 
 const transport = nodemailer.createTransport(config.email.smtp);
 /* istanbul ignore next */
@@ -32,12 +34,7 @@ const sendEmail = async (to, subject, text) => {
 const sendResetPasswordEmail = async (user, token) => {
   const subject = 'Reset password: OTP';
 
-  const text = `Dear ${user.firstName},
-You requested to reset your password. Kindly enter the One Time Password below (valid for 5mins):
-
-${token}
-
-If you did not request any password reset, we assure that your account is secure. Please ignore this email and do not share with a third party.`;
+  const text = sendOtpEmailTemplate(user.firstName, token);
   await sendEmail(user.email, subject, text);
 };
 
@@ -53,31 +50,15 @@ const sendVerificationEmail = async (user, token, transactionId) => {
   const verificationEmailUrl = `${config.client.baseUrlHosted}/verify-email?token=${token}${transactionId ? '&trans=' : ''}${
     transactionId || ''
   }`;
-  const text = `Dear ${user.firstName || 'user'},
-
-Welcome to Pipsgod Academy. To verify your email, click on this link: ${verificationEmailUrl}
-
-If you did not create an account, kindly ignore this email.
-
-Regards,
-The Pipsgod Team.`;
+  const text = sendVerificationEmailTemplate(user.firstName, verificationEmailUrl);
   await sendEmail(user.email, subject, text);
 };
 
 const confirmEmailVerification = async (user) => {
   const subject = 'Welcome to Pipsgod Academy';
+  const dashboardUrl = `${config.client.baseUrlHosted}/portal`;
 
-  const text = `Dear ${user.firstName} ,
-
-Welcome to Pipsgod Academy. Your email has been verified succesfully and we're glad to have you.
-
-Log in to your dashboard to explore:
-${config.client.baseUrlHosted}/portal
-
-Thank you again.
-
-Regards,
-The Pipsgod Academy Team.`;
+  const text = confirmEmailVerificationTemplate(user.firstName, dashboardUrl);
   await sendEmail(user.email, subject, text);
 };
 

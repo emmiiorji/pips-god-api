@@ -19,10 +19,6 @@ module.exports = (sequelize, dataType) => {
       type: dataType.STRING,
       trim: true,
     },
-    sequenceNo: {
-      type: dataType.INTEGER,
-      autoIncrement: true,
-    },
     thumbnail: {
       type: dataType.STRING,
       trim: true,
