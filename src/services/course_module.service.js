@@ -14,7 +14,7 @@ const createCourseModule = async (courseResourceBody) => {
   }
   const existingCourseModuleTitle = await db.course_modules.findOne({ where: { title: courseModule.title } });
   if (existingCourseModuleTitle) {
-    throw new ApiError(httpStatus.ALREADY_REPORTED, 'COURE_MODULE_TITLE_ALREADY_EXISTS');
+    throw new ApiError(httpStatus.ALREADY_REPORTED, 'COURSE_MODULE_TITLE_ALREADY_EXISTS');
   }
 
   const sequelizeTransaction = await db.sequelize.transaction();
@@ -38,7 +38,7 @@ const createCourseModule = async (courseResourceBody) => {
     );
 
     await sequelizeTransaction.commit();
-    return { ...createdCourseResources, course_resources: createdCourseResources };
+    return { ...courseModule, course_resources: createdCourseResources };
   } catch (error) {
     await sequelizeTransaction.rollback();
     logger.error(error);
@@ -120,7 +120,7 @@ const getCourseModuleById = async (id) => {
 const deleteCourseModuleById = async (courseModuleId) => {
   const courseModule = await getCourseModuleById(courseModuleId);
   if (!courseModule) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    throw new ApiError(httpStatus.NOT_FOUND, 'Course Module not found');
   }
   await db.course_modules.destroy(courseModule);
   return courseModule;
