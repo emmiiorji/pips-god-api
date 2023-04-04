@@ -1,4 +1,5 @@
 const httpStatus = require('http-status');
+const { Op } = require('sequelize');
 const ApiError = require('../utils/ApiError');
 const { db } = require('../models');
 const logger = require('../config/logger');
@@ -117,18 +118,82 @@ const getCourseModuleById = async (id) => {
  * @param {Object} updateBody
  * @returns {Promise<CourseModule>}
  */
-// const updateCourseModuleById = async (courseResourceId, updateBody) => {
-//   const courseResource = await getCourseModuleById(courseResourceId);
-//   if (!courseResource) {
-//     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-//   }
-//   if (updateBody.email && (await isEmailTaken(updateBody.email, userId))) {
-//     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-//   }
-//   Object.assign(user, updateBody);
-//   await db.users.update(user, { where: { id: userId } });
-//   return user;
-// };
+const updateCourseModuleById = async (courseModuleId, updateBody) => {
+  const existingCourseModule = await getCourseModuleById(courseModuleId);
+  if (!existingCourseModule) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'COURSE_MODULE_NOT_FOUND');
+  }
+  const { courseModule, courseResources } = updateBody;
+  if (!courseResources && !isResourceTypesUnique(courseResources)) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'COURSE_RESOURCE_TYPES_MUST_BE_UNIQUE');
+  }
+
+  if (courseModule && (await titleExists(courseModule.title)) && courseModule.title !== existingCourseModule.title) {
+    throw new ApiError(httpStatus.ALREADY_REPORTED, 'COURSE_MODULE_WITH_TITLE_ALREADY_EXISTS');
+  }
+  const sequelizeTransaction = await db.sequelize.transaction();
+  try {
+    await db.course_modules.update(courseModule, { where: { id: courseModuleId } }, { transaction: sequelizeTransaction });
+
+    if (courseResources !== undefined) {
+      const existingCourseResources = await db.course_resources.findAll({ where: { courseModuleId } });
+      let courseId;
+
+      // Create an object with the id as the key and the resource as the value
+      // Every resource in database has a type
+      const resourcesByType = existingCourseResources.reduce((acc, resource) => {
+        acc[resource.type] = resource;
+        courseId = courseId || resource.courseId; // Assign the courseId to the first resource. All resources have the same courseId
+        return acc;
+      }, {});
+
+      // Update only the resources that have changed
+      courseResources.forEach(async (courseResource) => {
+        const resource = resourcesByType[courseResource.type];
+        const changedKeys = Object.keys(resource.dataValues).filter((key) => {
+          return resource[key] !== courseResource[key] && courseResource[key] !== undefined;
+        });
+
+        const changedKeysAndValues = changedKeys.reduce(async (acc, key) => {
+          // Perform validation on the changed keys
+          if (key === 'type') {
+            if (courseResource.type === resourceTypes.VIDEO) {
+              if (!courseResource.thumbnail) {
+                // eslint-disable-next-line no-throw-literal
+                throw 'VIDEO_THUMBNAIL_REQUIRED';
+              }
+            }
+          }
+          acc[key] = courseResource[key];
+          return acc;
+        }, {});
+
+        changedKeysAndValues.then(async (data) => {
+          await db.course_resources.update(
+            data,
+            {
+              where: { [Op.and]: [{ courseModuleId }, { courseId }] },
+            },
+            { transaction: sequelizeTransaction }
+          );
+        });
+      });
+    }
+    await sequelizeTransaction.commit();
+    return { message: 'Course module updated successfully', status: 200 };
+  } catch (error) {
+    logger.error(error);
+    await sequelizeTransaction.rollback();
+    if (
+      error === 'VIDEO_THUMBNAIL_REQUIRED' ||
+      error === 'COURSE_MODULE_TITLE_ALREADY_EXISTS' ||
+      error === 'INVALID_COURSE_RESOURCE_KEY'
+    ) {
+      throw new ApiError(httpStatus.BAD_REQUEST, error);
+    }
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Error updating course module');
+  }
+};
 
 /**
  * Delete user by id
@@ -148,6 +213,6 @@ module.exports = {
   createCourseModule,
   queryCourseModules,
   getCourseModuleById,
-  // updateCourseModuleById,
+  updateCourseModuleById,
   deleteCourseModuleById,
 };
