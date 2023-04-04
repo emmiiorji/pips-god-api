@@ -1,5 +1,4 @@
 const httpStatus = require('http-status');
-const { Op } = require('sequelize');
 const ApiError = require('../utils/ApiError');
 const { db } = require('../models');
 const logger = require('../config/logger');
@@ -135,59 +134,45 @@ const updateCourseModuleById = async (courseModuleId, updateBody) => {
   try {
     await db.course_modules.update(courseModule, { where: { id: courseModuleId } }, { transaction: sequelizeTransaction });
 
+    let updatePromises;
     if (courseResources !== undefined) {
       const existingCourseResources = await db.course_resources.findAll({ where: { courseModuleId } });
-      let courseId;
 
-      // Create an object with the id as the key and the resource as the value
-      // Every resource in database has a type
-      const resourcesByType = existingCourseResources.reduce((acc, resource) => {
-        acc[resource.type] = resource;
-        courseId = courseId || resource.courseId; // Assign the courseId to the first resource. All resources have the same courseId
-        return acc;
-      }, {});
+      // Validate the course resources
+      courseResources.forEach((courseResource) => {
+        const resource = existingCourseResources.find((existingResource) => existingResource.id === courseResource.id);
+        if (!resource || resource.type !== courseResource.type) {
+          // eslint-disable-next-line no-throw-literal
+          throw 'ONE_OR_MORE_COURSE_RESOURCES_NOT_FOUND';
+        }
+        if (courseResource.type === resourceTypes.VIDEO) {
+          if (courseResource.thumbnail === '' || courseResource.thumbnail == null) {
+            // eslint-disable-next-line no-throw-literal
+            throw 'VIDEO_THUMBNAIL_REQUIRED';
+          }
+        }
+      });
 
       // Update only the resources that have changed
-      courseResources.forEach(async (courseResource) => {
-        const resource = resourcesByType[courseResource.type];
-        const changedKeys = Object.keys(resource.dataValues).filter((key) => {
-          return resource[key] !== courseResource[key] && courseResource[key] !== undefined;
-        });
-
-        const changedKeysAndValues = changedKeys.reduce(async (acc, key) => {
-          // Perform validation on the changed keys
-          if (key === 'type') {
-            if (courseResource.type === resourceTypes.VIDEO) {
-              if (!courseResource.thumbnail) {
-                // eslint-disable-next-line no-throw-literal
-                throw 'VIDEO_THUMBNAIL_REQUIRED';
-              }
-            }
-          }
-          acc[key] = courseResource[key];
-          return acc;
-        }, {});
-
-        changedKeysAndValues.then(async (data) => {
-          await db.course_resources.update(
-            data,
-            {
-              where: { [Op.and]: [{ courseModuleId }, { courseId }] },
-            },
-            { transaction: sequelizeTransaction }
-          );
-        });
-      });
+      updatePromises = courseResources.map((courseResource) =>
+        db.course_resources.update(
+          courseResource,
+          { where: { id: courseResource.id } },
+          { transaction: sequelizeTransaction }
+        )
+      );
     }
-    await sequelizeTransaction.commit();
-    return { message: 'Course module updated successfully', status: 200 };
+    return Promise.all(updatePromises).then(async () => {
+      await sequelizeTransaction.commit();
+      return { message: 'Course module updated successfully', status: 200 };
+    });
   } catch (error) {
     logger.error(error);
     await sequelizeTransaction.rollback();
     if (
       error === 'VIDEO_THUMBNAIL_REQUIRED' ||
       error === 'COURSE_MODULE_TITLE_ALREADY_EXISTS' ||
-      error === 'INVALID_COURSE_RESOURCE_KEY'
+      error === 'ONE_OR_MORE_COURSE_RESOURCES_NOT_FOUND'
     ) {
       throw new ApiError(httpStatus.BAD_REQUEST, error);
     }

@@ -61,9 +61,11 @@ const updateCourseModule = {
     }),
     courseResources: Joi.array().items(
       Joi.object().keys({
-        // id: Joi.number().integer().required(),
+        id: Joi.number().integer().required(),
         courseResourceId: Joi.number().integer(),
-        type: Joi.string().valid(...Object.values(resourceTypes)),
+        type: Joi.string()
+          .valid(...Object.values(resourceTypes))
+          .required(),
         description: Joi.string(),
         url: Joi.string(),
         thumbnail: Joi.string(),
