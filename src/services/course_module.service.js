@@ -117,12 +117,12 @@ const getCourseModuleById = async (id) => {
  * @param {ObjectId} courseModuleId
  * @returns {Promise<CourseModule>}
  */
-const deleteCourseModuleById = async (courseModuleId) => {
-  const courseModule = await getCourseModuleById(courseModuleId);
+const deleteCourseModuleById = async (id) => {
+  const courseModule = await getCourseModuleById(id);
   if (!courseModule) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Course Module not found');
   }
-  await db.course_modules.destroy(courseModule);
+  await db.course_modules.destroy({ where: { id } });
   return courseModule;
 };
 

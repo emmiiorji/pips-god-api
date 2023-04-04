@@ -31,7 +31,7 @@ const updateCourseModule = catchAsync(async (req, res) => {
 
 const deleteCourseModule = catchAsync(async (req, res) => {
   await courseModuleService.deleteCourseModuleById(req.params.courseModuleId);
-  res.status(httpStatus.NO_CONTENT).send();
+  res.status(httpStatus.OK).send({ data: null, status: 200 });
 });
 
 module.exports = {
