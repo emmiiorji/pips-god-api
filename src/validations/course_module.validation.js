@@ -35,7 +35,6 @@ const getCourseModules = {
     title: Joi.string(),
     tags: Joi.string(),
     logo: Joi.string(),
-    sequenceNo: Joi.number().integer(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
     page: Joi.number().integer(),
@@ -50,7 +49,7 @@ const getCourseModule = {
 
 const updateCourseModule = {
   params: Joi.object().keys({
-    courseModueId: Joi.required(),
+    courseModuleId: Joi.required(),
   }),
   body: Joi.object().keys({
     courseModule: Joi.object().keys({
@@ -58,12 +57,12 @@ const updateCourseModule = {
       title: Joi.string(),
       tags: Joi.string(),
       logo: Joi.string(),
-      sequenceNo: Joi.number().integer(),
       thumbnail: Joi.string(),
-      courseId: Joi.number().integer(),
     }),
     courseResources: Joi.array().items(
       Joi.object().keys({
+        // id: Joi.number().integer().required(),
+        courseResourceId: Joi.number().integer(),
         type: Joi.string().valid(...Object.values(resourceTypes)),
         description: Joi.string(),
         url: Joi.string(),

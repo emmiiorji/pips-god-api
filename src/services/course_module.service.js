@@ -4,6 +4,21 @@ const { db } = require('../models');
 const logger = require('../config/logger');
 const { resourceTypes } = require('../config/constants');
 
+const titleExists = async (title) => {
+  const courseModule = await db.course_modules.findOne({ where: { title } });
+  return courseModule;
+};
+
+const isResourceTypesUnique = (courseResources) => {
+  // Check if there's a repeating resource type
+  const types = courseResources.map((courseResource) => courseResource.type);
+  const uniqueResourceTypes = [...new Set(types)];
+  if (types.length !== uniqueResourceTypes.length) {
+    return false;
+  }
+  return true;
+};
+
 // Course Resource is created at the same time as the Course Module
 const createCourseModule = async (courseResourceBody) => {
   const { courseModule, courseResources } = courseResourceBody;
@@ -12,10 +27,13 @@ const createCourseModule = async (courseResourceBody) => {
   if (!featuredCourse) {
     throw new ApiError(httpStatus.NOT_FOUND, 'COURSE_NOT_FOUND');
   }
-  const existingCourseModuleTitle = await db.course_modules.findOne({ where: { title: courseModule.title } });
-  if (existingCourseModuleTitle) {
+
+  if (await titleExists(courseModule.title)) {
     throw new ApiError(httpStatus.ALREADY_REPORTED, 'COURSE_MODULE_TITLE_ALREADY_EXISTS');
   }
+
+  if (!isResourceTypesUnique(courseResources))
+    throw new ApiError(httpStatus.BAD_REQUEST, 'COURSE_RESOURCE_TYPES_MUST_BE_UNIQUE');
 
   const sequelizeTransaction = await db.sequelize.transaction();
   try {
@@ -23,7 +41,7 @@ const createCourseModule = async (courseResourceBody) => {
     const createdCourseResources = await db.course_resources.bulkCreate(
       courseResources.map((courseResource) => {
         if (courseResource.type === resourceTypes.VIDEO) {
-          if (courseResource.thumbnail === undefined) {
+          if (!courseResource.thumbnail) {
             // eslint-disable-next-line no-throw-literal
             throw 'VIDEO_THUMBNAIL_REQUIRED';
           }
@@ -86,11 +104,11 @@ const queryCourseModules = async (filter, options) => {
  * @returns {Promise<CourseModule>}
  */
 const getCourseModuleById = async (id) => {
-  const courseResource = await db.course_resources.findByPk(id, {
-    include: { model: db.course_modules, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+  const courseModule = await db.course_modules.findByPk(id, {
+    include: { model: db.course_resources, attributes: { exclude: ['createdAt', 'updatedAt'] } },
     attributes: { exclude: ['createdAt', 'updatedAt'] },
   });
-  return courseResource;
+  return courseModule;
 };
 
 /**
