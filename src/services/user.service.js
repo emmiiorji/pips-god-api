@@ -12,7 +12,7 @@ const { generateAuthTokens } = require('./token.service');
  * @returns {Promise<boolean>}
  */
 const isEmailTaken = async function (email, role = false) {
-  const oldUser = db.users.findOne({ where: { email }, include: [{ model: db.roles, attributes: ['name'] }] });
+  const oldUser = await db.users.findOne({ where: { email }, include: [{ model: db.roles, attributes: ['name'] }] });
   const userRoles = oldUser ? oldUser.roles.map((r) => r.name) : [];
   logger.info(oldUser);
   return { emailTaken: userRoles.includes(role), userRoles, oldUser };
