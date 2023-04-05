@@ -43,13 +43,13 @@ const getCourseModules = {
 
 const getCourseModule = {
   params: Joi.object().keys({
-    courseModuleId: Joi.string().required(),
+    courseModuleId: Joi.number().integer().required(),
   }),
 };
 
 const updateCourseModule = {
   params: Joi.object().keys({
-    courseModuleId: Joi.string().required(),
+    courseModuleId: Joi.number().integer().required(),
   }),
   body: Joi.object().keys({
     courseModule: Joi.object().keys({
