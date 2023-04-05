@@ -135,29 +135,44 @@ const updateCourseModuleById = async (courseModuleId, updateBody) => {
     await db.course_modules.update(courseModule, { where: { id: courseModuleId } }, { transaction: sequelizeTransaction });
 
     let updatePromises;
+    const filteredResources = [];
     if (courseResources !== undefined) {
       const existingCourseResources = await db.course_resources.findAll({ where: { courseModuleId } });
 
       // Validate the course resources
       courseResources.forEach((courseResource) => {
         const resource = existingCourseResources.find((existingResource) => existingResource.id === courseResource.id);
-        if (!resource || resource.type !== courseResource.type) {
+        if (!resource) {
           // eslint-disable-next-line no-throw-literal
           throw 'ONE_OR_MORE_COURSE_RESOURCES_NOT_FOUND';
         }
-        if (courseResource.type === resourceTypes.VIDEO) {
-          if (courseResource.thumbnail === '' || courseResource.thumbnail == null) {
-            // eslint-disable-next-line no-throw-literal
-            throw 'VIDEO_THUMBNAIL_REQUIRED';
+        const changedKeys = Object.keys(resource.dataValues).filter((key) => {
+          return resource[key] !== courseResource[key] && courseResource[key] !== undefined;
+        });
+
+        const changedKeysAndValues = changedKeys.reduce((acc, key) => {
+          // Perform validation on the changed keys
+          if (key === 'type') {
+            if (courseResource.type === resourceTypes.VIDEO) {
+              if (!courseResource.thumbnail) {
+                // eslint-disable-next-line no-throw-literal
+                throw 'VIDEO_RESOURCES_REQUIRE_THUMBNAIL';
+              }
+            }
           }
-        }
+          acc[key] = courseResource[key];
+          return acc;
+        }, {});
+        // Remove unchanged resources
+        if (Object.keys(changedKeysAndValues).length > 0)
+          filteredResources.push({ ...changedKeysAndValues, id: courseResource.id });
       });
 
       // Update only the resources that have changed
-      updatePromises = courseResources.map((courseResource) =>
+      updatePromises = filteredResources.map((filteredResource) =>
         db.course_resources.update(
-          courseResource,
-          { where: { id: courseResource.id } },
+          filteredResource,
+          { where: { id: filteredResource.id } },
           { transaction: sequelizeTransaction }
         )
       );
@@ -170,7 +185,7 @@ const updateCourseModuleById = async (courseModuleId, updateBody) => {
     logger.error(error);
     await sequelizeTransaction.rollback();
     if (
-      error === 'VIDEO_THUMBNAIL_REQUIRED' ||
+      error === 'VIDEO_RESOURCES_REQUIRE_THUMBNAIL' ||
       error === 'COURSE_MODULE_TITLE_ALREADY_EXISTS' ||
       error === 'ONE_OR_MORE_COURSE_RESOURCES_NOT_FOUND'
     ) {
