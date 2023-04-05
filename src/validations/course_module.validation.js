@@ -53,7 +53,7 @@ const updateCourseModule = {
   }),
   body: Joi.object().keys({
     courseModule: Joi.object().keys({
-      courseModuleId: Joi.string(),
+      courseModuleId: Joi.number().integer(),
       description: Joi.string(),
       title: Joi.string(),
       tags: Joi.string(),
