@@ -19,6 +19,8 @@ router
 
 router.route('/d/dashboard').get(validate(userValidation.getAdminDashboardStats), userController.getAdminDashboardStats); // auth('users.manage'),
 
+router.route('/is_email_taken').post(validate(userValidation.isEmailTaken), userController.isEmailTaken);
+
 module.exports = router;
 
 /**

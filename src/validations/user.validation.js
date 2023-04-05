@@ -2,6 +2,13 @@ const Joi = require('joi');
 const moment = require('moment');
 const { password, objectId } = require('./custom.validation');
 
+const isEmailTaken = {
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    role: Joi.string().trim().required(),
+  }),
+};
+
 const createUser = {
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -65,4 +72,5 @@ module.exports = {
   getAdminDashboardStats,
   updateUser,
   deleteUser,
+  isEmailTaken,
 };

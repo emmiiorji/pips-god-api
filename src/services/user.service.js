@@ -11,10 +11,11 @@ const { generateAuthTokens } = require('./token.service');
  * @param {string} email - The user's email
  * @returns {Promise<boolean>}
  */
-const isEmailTaken = async function (email) {
-  const user = await db.users.findOne({ where: { email } });
-  logger.info(user);
-  return !!user;
+const isEmailTaken = async function (email, role = false) {
+  const oldUser = db.users.findOne({ where: { email }, include: [{ model: db.roles, attributes: ['name'] }] });
+  const userRoles = oldUser ? oldUser.roles.map((r) => r.name) : [];
+  logger.info(oldUser);
+  return { emailTaken: userRoles.includes(role), userRoles, oldUser };
 };
 
 /**
@@ -40,12 +41,18 @@ const createAdminUser = async (userBody) => {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not a superadmin');
   }
 
-  if (await isEmailTaken(userBody.email)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
-  }
-  user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
+  const { userRoles, emailTaken, oldUser } = await isEmailTaken(userBody.email, 'admin');
+  if (emailTaken) {
+    if (!oldUser) throw new ApiError(httpStatus.BAD_REQUEST, 'EMAIL_TAKEN');
 
-  const userCreated = await db.users.create(user);
+    throw new ApiError(httpStatus.BAD_REQUEST, `ALREADY_${role.toUpperCase()}`);
+  }
+
+  let userCreated;
+  if (userRoles.length < 1) {
+    user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
+    userCreated = oldUser || (await db.users.create(user));
+  }
 
   const adminRole = await db.roles.findOne({ where: { name: 'admin' } });
   await userCreated.addRole(adminRole);
@@ -62,11 +69,11 @@ const createAdminUser = async (userBody) => {
  * @returns {Promise<User>}
  */
 const createUser = async (userBody) => {
-  const { transactionAccessCode, role, ...user } = userBody;
+  const { transactionAccessCode, ...user } = userBody;
   const transactionId = transactionAccessCode; // The data expected is transaction ID not access code
   const userRole = await db.roles.findOne({ where: { name: 'user' } });
 
-  if (!userRole && role) throw new ApiError(httpStatus.BAD_REQUEST, 'Role does not exist');
+  // if (!userRole && role) throw new ApiError(httpStatus.BAD_REQUEST, 'Role does not exist');
 
   // TODO: If role is admin, check if user is admin or superadmin
 
@@ -77,20 +84,28 @@ const createUser = async (userBody) => {
 
   if (transaction.isUsed) throw new ApiError(httpStatus.ALREADY_REPORTED, 'This transaction has been used');
 
-  if (await isEmailTaken(userBody.email)) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  const { userRoles, emailTaken, oldUser } = await isEmailTaken(userBody.email, 'user');
+  if (emailTaken) {
+    if (!oldUser) throw new ApiError(httpStatus.BAD_REQUEST, 'EMAIL_TAKEN');
+
+    throw new ApiError(httpStatus.BAD_REQUEST, `ALREADY_${userRole.name.toUpperCase()}`);
   }
-  // eslint-disable-next-line no-param-reassign
-  user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
+
+  let userCreated;
+  if (userRoles.length < 1) {
+    user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
+    userCreated = oldUser || (await db.users.create(user));
+  }
+  // user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
 
   let sequelizeTransaction;
   try {
     // Use a transaction to create the user and subscription
     sequelizeTransaction = await db.sequelize.transaction();
-    const userCreated = await db.users.create(user, { transaction: sequelizeTransaction });
+    userCreated = userCreated || (await db.users.create(user, { transaction: sequelizeTransaction }));
     const subscriptionPlan = await db.subscription_plans.findByPk(transaction.subscriptionPlanId);
 
-    await userCreated.addRole(role || userRole.id, { transaction: sequelizeTransaction });
+    await userCreated.addRole(userRole.id, { transaction: sequelizeTransaction });
     await db.subscriptions.create(
       {
         userId: userCreated.id,
@@ -354,4 +369,5 @@ module.exports = {
   updateUserById,
   deleteUserById,
   isPasswordMatch,
+  isEmailTaken,
 };

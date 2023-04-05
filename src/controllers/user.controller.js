@@ -4,6 +4,11 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { userService } = require('../services');
 
+const isEmailTaken = catchAsync(async (req, res) => {
+  const { emailTaken } = await userService.isEmailTaken(req.body.email, req.body.role);
+  return res.status(httpStatus.OK).send({ data: emailTaken });
+});
+
 const createUser = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
   res.status(httpStatus.CREATED).send(user);
@@ -46,4 +51,5 @@ module.exports = {
   updateUser,
   deleteUser,
   getAdminDashboardStats,
+  isEmailTaken,
 };
