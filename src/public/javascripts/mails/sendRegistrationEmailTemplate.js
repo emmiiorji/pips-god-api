@@ -39,7 +39,7 @@ module.exports = (planTitle, registrationUrl) => {
                     <td style="padding: 0;">
                       <p style="margin-top: 50px;">Hi,</p>
                       <p>
-                        Thank you for subscribing to the ${planTitle} plan on Pipsgod Academy. Kindly follow the link below to register.
+                        Thank you for subscribing to the ${planTitle} plan on Pipsgod Academy. Kindly click on the button below to register.
                       </p>
                     </td>
                   </tr>
