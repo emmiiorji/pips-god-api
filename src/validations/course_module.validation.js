@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const { resourceTypes } = require('../config/constants');
+const { tags } = require('./custom.validation');
 
 const createCourseModule = {
   body: Joi.object().keys({
@@ -7,7 +8,7 @@ const createCourseModule = {
       .keys({
         description: Joi.string(),
         title: Joi.string().required(),
-        tags: Joi.string().required(),
+        tags: Joi.string().required().custom(tags),
         logo: Joi.string(),
         thumbnail: Joi.string(),
         courseId: Joi.number().integer().required(),
@@ -33,7 +34,7 @@ const getCourseModules = {
   query: Joi.object().keys({
     description: Joi.string(),
     title: Joi.string(),
-    tags: Joi.string(),
+    tags: Joi.string().custom(tags),
     logo: Joi.string(),
     sortBy: Joi.string(),
     limit: Joi.number().integer(),
@@ -56,7 +57,7 @@ const updateCourseModule = {
       courseModuleId: Joi.number().integer(),
       description: Joi.string(),
       title: Joi.string(),
-      tags: Joi.string(),
+      tags: Joi.string().custom(tags),
       logo: Joi.string(),
       thumbnail: Joi.string(),
     }),
