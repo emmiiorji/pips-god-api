@@ -1,7 +1,12 @@
 const nodemailer = require('nodemailer');
+const { convert } = require('html-to-text');
 const config = require('../config/config');
 const logger = require('../config/logger');
-const { sendOtpEmailTemplate, sendVerificationEmailTemplate } = require('../public/javascripts/mails');
+const {
+  sendOtpEmailTemplate,
+  sendVerificationEmailTemplate,
+  sendRegistrationEmailTemplate,
+} = require('../public/javascripts/mails');
 const confirmEmailVerificationTemplate = require('../public/javascripts/mails/confirmEmailVerificationTemplate');
 
 const transport = nodemailer.createTransport(config.email.smtp);
@@ -20,8 +25,10 @@ if (config.env !== 'test') {
  * @param {string} text
  * @returns {Promise}
  */
-const sendEmail = async (to, subject, text) => {
-  const msg = { from: config.email.from, to, subject, text };
+const sendEmail = async (to, subject, html, text) => {
+  // eslint-disable-next-line no-param-reassign
+  text = text || convert(html);
+  const msg = { from: config.email.from, to, subject, html, text };
   await transport.sendMail(msg);
 };
 
@@ -34,8 +41,8 @@ const sendEmail = async (to, subject, text) => {
 const sendResetPasswordEmail = async (user, token) => {
   const subject = 'Reset password: OTP';
 
-  const text = sendOtpEmailTemplate(user.firstName, token);
-  await sendEmail(user.email, subject, text);
+  const html = sendOtpEmailTemplate(user.firstName, token);
+  await sendEmail(user.email, subject, html);
 };
 
 /**
@@ -50,16 +57,16 @@ const sendVerificationEmail = async (user, token, transactionId) => {
   const verificationEmailUrl = `${config.client.baseUrlHosted}/verify-email?token=${token}${transactionId ? '&trans=' : ''}${
     transactionId || ''
   }`;
-  const text = sendVerificationEmailTemplate(user.firstName, verificationEmailUrl);
-  await sendEmail(user.email, subject, text);
+  const html = sendVerificationEmailTemplate(user.firstName, verificationEmailUrl);
+  await sendEmail(user.email, subject, html);
 };
 
 const confirmEmailVerification = async (user) => {
   const subject = 'Welcome to Pipsgod Academy';
   const dashboardUrl = `${config.client.baseUrlHosted}/portal`;
 
-  const text = confirmEmailVerificationTemplate(user.firstName, dashboardUrl);
-  await sendEmail(user.email, subject, text);
+  const html = confirmEmailVerificationTemplate(user.firstName, dashboardUrl);
+  await sendEmail(user.email, subject, html);
 };
 
 const resendVerificationEmail = async (user, token, transactionId) => {
@@ -82,15 +89,9 @@ The Pipsgod Academy Team.`;
 const sendRegistrationEmail = async (transaction, registrationUrl, planTitle) => {
   const subject = 'Subscription Successful';
 
-  const text = `Hi ,
+  const html = sendRegistrationEmailTemplate(planTitle, registrationUrl);
 
-Thank you for subscribing to the ${planTitle} plan on Pipsgod Academy. Kindly follow the link below to register:
-
-${registrationUrl}
-
-Regards,
-The Pipsgod Academy Team.`;
-  await sendEmail(transaction.email, subject, text);
+  await sendEmail(transaction.email, subject, html);
 };
 
 const sendVipSignalsEmail = async (transaction, subscriptionPlan) => {

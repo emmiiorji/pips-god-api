@@ -20,7 +20,7 @@ module.exports = (firstName, otp) => {
                   <td style="background-color:#2b1f68;padding:10px;text-align:center;">
                     <p style="margin:0;font-weight:bold;">
                       <a href="" style="text-decoration:none;color:#f6f9fc;font-weight: bolder;">
-                        <img src="../../img/logo.png" width="35px" alt="Logo" style="border: 0;">
+                        <img src="https://res.cloudinary.com/emmii/image/upload/v1680795241/Pipsgod%20Academy/logo_njzjyf.png" width="35px" alt="Logo" style="border: 0;">
                         <br>
                         Pipsgod Academy
                       </a>

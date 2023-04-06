@@ -1,4 +1,4 @@
-module.exports = (firstName, verificationEmailUrl) => {
+module.exports = (planTitle, registrationUrl) => {
   return `
   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
   <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
@@ -37,15 +37,15 @@ module.exports = (firstName, verificationEmailUrl) => {
                 <table style="border-spacing: 0;">
                   <tr>
                     <td style="padding: 0;">
-                      <p style="margin-top: 50px;">Dear ${firstName || 'User'},</p>
+                      <p style="margin-top: 50px;">Hi,</p>
                       <p>
-                        Welcome to Pipsgod Academy. To verify your email and enjoy our amazing tutorials and mentorships, please click on the button below.
+                        Thank you for subscribing to the ${planTitle} plan on Pipsgod Academy. Kindly follow the link below to register.
                       </p>
-                      <a href="${verificationEmailUrl}" style="background: #439b73;border: none;font-weight: bold;cursor: pointer;padding: 10px;color: white;border-radius: 5px;font-size: 16px;margin: 0 calc(50% - 65px);text-align: center;text-decoration: none;">
-                        Verify Email
+                      <a href="${registrationUrl}" style="background: #439b73;border: none;font-weight: bold;cursor: pointer;padding: 10px;color: white;border-radius: 5px;font-size: 16px;margin: 0 calc(50% - 65px);text-align: center;text-decoration: none;">
+                        Register
                       </a>
                       <p>
-                        If you have not registered on Pipsgod Academy, kindly ignore this email.
+                        We look forward to having you on board.
                       </p>
                     </td>
                   </tr>
