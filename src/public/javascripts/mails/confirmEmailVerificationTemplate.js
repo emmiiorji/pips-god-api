@@ -43,9 +43,19 @@ module.exports = (firstName, dashboardUrl) => {
                         <br>
                         Kindly log in to your dashboard to start learning.
                       </p>
-                      <a href="${dashboardUrl}" style="background: #439b73;border: none;font-weight: bold;cursor: pointer;padding: 10px;color: white;border-radius: 5px;font-size: 16px;margin: 0 calc(50% - 65px);text-align: center;text-decoration: none;">
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="padding: 0 calc(50% - 65px)">
+                      <a href="${dashboardUrl}" style="background: #439b73;border: none;font-weight: bold;cursor: pointer;padding: 10px;color: white;border-radius: 5px;font-size: 16px;text-align: center;text-decoration: none;">
                         Go to Dashboard
                       </a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
                       <p>
                         Thank you for choosing Pipsgod Academy.
                       </p>

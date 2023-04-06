@@ -40,10 +40,20 @@ module.exports = (firstName, verificationEmailUrl) => {
                       <p style="margin-top: 50px;">Dear ${firstName || 'User'},</p>
                       <p>
                         Welcome to Pipsgod Academy. To verify your email and enjoy our amazing tutorials and mentorships, please click on the button below.
-                      </p>
+                      </p>                      
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="padding: 0 calc(50% - 60px)">
                       <a href="${verificationEmailUrl}" style="background: #439b73;border: none;font-weight: bold;cursor: pointer;padding: 10px;color: white;border-radius: 5px;font-size: 16px;margin: 0 calc(50% - 65px);text-align: center;text-decoration: none;">
                         Verify Email
                       </a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
                       <p>
                         If you have not registered on Pipsgod Academy, kindly ignore this email.
                       </p>

@@ -41,15 +41,24 @@ module.exports = (planTitle, registrationUrl) => {
                       <p>
                         Thank you for subscribing to the ${planTitle} plan on Pipsgod Academy. Kindly follow the link below to register.
                       </p>
-                      <a href="${registrationUrl}" style="background: #439b73;border: none;font-weight: bold;cursor: pointer;padding: 10px;color: white;border-radius: 5px;font-size: 16px;margin: 0 calc(50% - 65px);text-align: center;text-decoration: none;">
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="padding: 0 calc(50% - 32px)">
+                      <a href="${registrationUrl}" style="background: #439b73;border: none;font-weight: bold;cursor: pointer;padding: 10px;color: white;border-radius: 5px;font-size: 16px;text-align: center;text-decoration: none;">
                         Register
                       </a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
                       <p>
                         We look forward to having you on board.
                       </p>
                     </td>
                   </tr>
-    
                 </table>
               </td>
             </tr>

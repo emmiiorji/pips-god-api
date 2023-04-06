@@ -42,16 +42,26 @@ module.exports = (firstName, otp) => {
                       You have requested for a password reset on your Pipsgod Academy account. 
                       If you did, kindly enter the OTP below (valid for 5mins) to reset your password.
                     </p>
-                    <p style="background:#439b73; border: none; font-weight: bold;
-                      padding: 10px; color: white; border-radius: 5px; font-size:1rem;margin: 0 calc(50% - 50px);text-align: center; width: 80px;">
-                      ${otp}
-                    </p>
-                    <p>
-                      If you did not request to reset your password, you can simply disregard this email and do not share with a third-party.
-                      We assure the safety of your account.
-                    </p>
                   </td>
                 </tr>
+
+                <tr>
+                    <td style="padding: 0 calc(50% - 32px)">
+                      <p style="background:#439b73; border: none; font-weight: bold;
+                      padding: 10px; color: white; border-radius: 5px; font-size:1rem;text-align: center;">
+                      ${otp}
+                    </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <p>
+                        If you did not request to reset your password, you can simply disregard this email and do not share with a third-party.
+                        We assure the safety of your account.
+                      </p>
+                    </td>
+                  </tr>
               </table>
             </td>
           </tr>
