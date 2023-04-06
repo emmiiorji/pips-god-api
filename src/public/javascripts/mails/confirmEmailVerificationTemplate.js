@@ -47,7 +47,7 @@ module.exports = (firstName, dashboardUrl) => {
                   </tr>
 
                   <tr>
-                    <td style="padding: 0 calc(50% - 65px)">
+                    <td style="padding: 10px calc(50% - 75px);">
                       <a href="${dashboardUrl}" style="background: #439b73;border: none;font-weight: bold;cursor: pointer;padding: 10px;color: white;border-radius: 5px;font-size: 16px;text-align: center;text-decoration: none;">
                         Go to Dashboard
                       </a>

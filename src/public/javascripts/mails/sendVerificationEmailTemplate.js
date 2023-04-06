@@ -45,8 +45,8 @@ module.exports = (firstName, verificationEmailUrl) => {
                   </tr>
 
                   <tr>
-                    <td style="padding: 0 calc(50% - 60px)">
-                      <a href="${verificationEmailUrl}" style="background: #439b73;border: none;font-weight: bold;cursor: pointer;padding: 10px;color: white;border-radius: 5px;font-size: 16px;margin: 0 calc(50% - 65px);text-align: center;text-decoration: none;">
+                    <td style="padding: 10px calc(50% - 60px)">
+                      <a href="${verificationEmailUrl}" style="background: #439b73;border: none;font-weight: bold;cursor: pointer;padding: 10px;color: white;border-radius: 5px;font-size: 16px;text-align: center;text-decoration: none;">
                         Verify Email
                       </a>
                     </td>

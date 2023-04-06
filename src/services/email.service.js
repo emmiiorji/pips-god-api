@@ -8,6 +8,7 @@ const {
   sendRegistrationEmailTemplate,
 } = require('../public/javascripts/mails');
 const confirmEmailVerificationTemplate = require('../public/javascripts/mails/confirmEmailVerificationTemplate');
+const resendVerificationEmailTemplate = require('../public/javascripts/mails/resendVerificationEmailTemplate');
 
 const transport = nodemailer.createTransport(config.email.smtp);
 /* istanbul ignore next */
@@ -75,15 +76,8 @@ const resendVerificationEmail = async (user, token, transactionId) => {
   const verificationEmailUrl = `${config.client.baseUrlHosted}/verify-email?token=${token}${transactionId ? '&trans=' : ''}${
     transactionId || ''
   }`;
-  const text = `Dear ${user.firstName || 'user'},
-
-Welcome to Pipsgod Academy. You seem to have tried to verify your email using an expired link. Here's a new link to verify your email: ${verificationEmailUrl}
-
-If you did not create an account with us, kindly ignore this email.
-
-Regards,
-The Pipsgod Academy Team.`;
-  await sendEmail(user.email, subject, text);
+  const html = resendVerificationEmailTemplate(user.firstName, verificationEmailUrl);
+  await sendEmail(user.email, subject, html);
 };
 
 const sendRegistrationEmail = async (transaction, registrationUrl, planTitle) => {

@@ -46,11 +46,11 @@ module.exports = (firstName, otp) => {
                 </tr>
 
                 <tr>
-                    <td style="padding: 0 calc(50% - 32px)">
+                    <td style="padding: 10px calc(50% - 40px)">
                       <p style="background:#439b73; border: none; font-weight: bold;
-                      padding: 10px; color: white; border-radius: 5px; font-size:1rem;text-align: center;">
-                      ${otp}
-                    </p>
+                      padding: 10px; color: white; border-radius: 5px; font-size:1rem;text-align: center;margin: 0">
+                        ${otp}
+                      </p>
                     </td>
                   </tr>
 
