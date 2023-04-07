@@ -48,11 +48,10 @@ const createAdminUser = async (userBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, `ALREADY_${role.toUpperCase()}`);
   }
 
-  let userCreated;
   if (userRoles.length < 1) {
     user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
-    userCreated = oldUser || (await db.users.create(user));
   }
+  const userCreated = oldUser || (await db.users.create(user));
 
   const adminRole = await db.roles.findOne({ where: { name: 'admin' } });
   await userCreated.addRole(adminRole);

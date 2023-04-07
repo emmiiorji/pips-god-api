@@ -1,4 +1,4 @@
-module.exports = (planTitle, registrationUrl) => {
+module.exports = (firstName, planTitle, telegramGroupUrl) => {
   return `
   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
   <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
@@ -37,17 +37,17 @@ module.exports = (planTitle, registrationUrl) => {
                 <table style="border-spacing: 0;">
                   <tr>
                     <td style="padding: 0;">
-                      <p style="margin-top: 50px;">Hi,</p>
+                      <p style="margin-top: 50px;">Hi ${firstName || 'User'},</p>
                       <p>
-                        Thank you for subscribing to the ${planTitle} plan on Pipsgod Academy. Kindly click on the button below to register in case you did not follow up on registration after your payment.
+                        Welcome again to Pipsgod Academy. Thank you for subscribing to the ${planTitle} plan on Pipsgod Academy. Here's the link to the telegram group for classes:
                       </p>
                     </td>
                   </tr>
 
                   <tr>
-                    <td style="padding: 10px calc(50% - 32px)">
-                      <a href="${registrationUrl}" style="background: #439b73;border: none;font-weight: bold;cursor: pointer;padding: 10px;color: white;border-radius: 5px;font-size: 16px;text-align: center;text-decoration: none;">
-                        Register
+                    <td style="padding: 10px calc(50% - 90px);">
+                      <a href="${telegramGroupUrl}" style="background: #439b73;border: none;font-weight: bold;cursor: pointer;padding: 10px;color: white;border-radius: 5px;font-size: 16px;text-align: center;text-decoration: none;">
+                        Join Telegram Group
                       </a>
                     </td>
                   </tr>
@@ -55,10 +55,11 @@ module.exports = (planTitle, registrationUrl) => {
                   <tr>
                     <td>
                       <p>
-                        We look forward to having you on board.
+                        Thank you for choosing Pipsgod Academy.
                       </p>
                     </td>
                   </tr>
+    
                 </table>
               </td>
             </tr>

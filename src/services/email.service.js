@@ -6,6 +6,7 @@ const {
   sendOtpEmailTemplate,
   sendVerificationEmailTemplate,
   sendRegistrationEmailTemplate,
+  sendVipSignalRegistrationEmailTemplate,
 } = require('../public/javascripts/mails');
 const confirmEmailVerificationTemplate = require('../public/javascripts/mails/confirmEmailVerificationTemplate');
 const resendVerificationEmailTemplate = require('../public/javascripts/mails/resendVerificationEmailTemplate');
@@ -88,18 +89,11 @@ const sendRegistrationEmail = async (transaction, registrationUrl, planTitle) =>
   await sendEmail(transaction.email, subject, html);
 };
 
-const sendVipSignalsEmail = async (transaction, subscriptionPlan) => {
+const sendVipSignalsEmail = async (firstName, transaction, subscriptionPlan) => {
   const subject = 'Subscription Successful';
 
-  const text = `Hi ,
-
-Thank you for subscribing to the ${subscriptionPlan.title} plan on Pipsgod Academy. Here's the link to the telegram group for classes:
-
-${subscriptionPlan.telegramGroupUrl}
-
-Regards,
-The Pipsgod Academy Team.`;
-  await sendEmail(transaction.email, subject, text);
+  const html = sendVipSignalRegistrationEmailTemplate(firstName, subscriptionPlan.title, subscriptionPlan.telegramGroupUrl);
+  await sendEmail(transaction.email, subject, html);
 };
 
 module.exports = {

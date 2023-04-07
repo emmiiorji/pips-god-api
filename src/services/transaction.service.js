@@ -8,6 +8,7 @@ const { transactionStatuses } = require('../config/constants');
 const { emailService } = require('.');
 const { subscriptionNames } = require('../config/constants');
 const logger = require('../config/logger');
+const { isEmailTaken } = require('./user.service');
 
 const camelToCapitalized = (str) => {
   let words = str.match(/[A-Z][a-z]+/g);
@@ -143,7 +144,11 @@ const verifyTransaction = async (transactionId, isRenew = false) => {
           return acc;
         }, {});
         sequelizeTransaction = await db.sequelize.transaction();
-        const userCreated = await db.users.create(user, { transaction: sequelizeTransaction });
+        const { oldUser } = await isEmailTaken(user.email, 'user');
+
+        const userCreated = oldUser || (await db.users.create(user));
+
+        // userCreated = !emailTaken ? oldUser : await db.users.create(user, { transaction: sequelizeTransaction });
 
         const userRole = await db.roles.findOne({ where: { name: 'user' } });
         await userCreated.addRole(userRole.id, { transaction: sequelizeTransaction });
@@ -160,7 +165,7 @@ const verifyTransaction = async (transactionId, isRenew = false) => {
 
         await db.transactions.update({ isUsed: true }, { where: { id: transaction.id }, transaction: sequelizeTransaction });
 
-        await emailService.sendVipSignalsEmail(transaction, subscriptionPlan);
+        await emailService.sendVipSignalsEmail(userCreated.firstName, transaction, subscriptionPlan);
         await sequelizeTransaction.commit();
         return { status: response.data.status };
       } catch (error) {
