@@ -11,6 +11,11 @@ router
   .post(validate(courseModuleValidation.createCourseModule), courseModuleController.createCourseModule)
   .get(validate(courseModuleValidation.getCourseModules), courseModuleController.getCourseModules);
 
+router.route('/brief/').get(validate(courseModuleValidation.getCourseModule), courseModuleController.getCourseModuleBrief);
+router
+  .route('/brief/:courseModuleId')
+  .get(validate(courseModuleValidation.getCourseModule), courseModuleController.getCourseModuleBrief);
+
 router
   .route('/:courseModuleId')
   .get(validate(courseModuleValidation.getCourseModule), courseModuleController.getCourseModule)

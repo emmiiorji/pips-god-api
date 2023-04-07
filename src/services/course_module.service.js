@@ -76,7 +76,7 @@ const createCourseModule = async (courseResourceBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryCourseModules = async (filter, options) => {
+const queryCourseModules = async (filter, options, brief = false) => {
   if (options.sortBy !== undefined) {
     const [sortBy, direction] = options.sortBy.split(':');
     if (!Object.keys(db.course_resources.rawAttributes).includes(sortBy)) {
@@ -89,12 +89,22 @@ const queryCourseModules = async (filter, options) => {
     // eslint-disable-next-line no-param-reassign
     options.order = [[options.sortBy, options.direction]];
   }
-  const courseResources = await db.course_modules.paginate({
-    where: filter,
-    ...options,
-    include: { model: db.course_resources, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-    attributes: { exclude: ['createdAt', 'updatedAt'] },
-  }); // .paginate(filter, options);
+  let courseResources;
+  if (brief) {
+    courseResources = await db.course_modules.paginate({
+      where: filter,
+      ...options,
+      include: { model: db.course_resources, attributes: { exclude: ['createdAt', 'updatedAt', 'url'] } },
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+    }); // .paginate(filter, options);
+  } else {
+    courseResources = await db.course_modules.paginate({
+      where: filter,
+      ...options,
+      include: { model: db.course_resources, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+    }); // .paginate(filter, options);
+  }
   return courseResources;
 };
 
@@ -103,11 +113,19 @@ const queryCourseModules = async (filter, options) => {
  * @param {ObjectId} id
  * @returns {Promise<CourseModule>}
  */
-const getCourseModuleById = async (id) => {
-  const courseModule = await db.course_modules.findByPk(id, {
-    include: { model: db.course_resources, attributes: { exclude: ['createdAt', 'updatedAt'] } },
-    attributes: { exclude: ['createdAt', 'updatedAt'] },
-  });
+const getCourseModuleById = async (id, brief = false) => {
+  let courseModule;
+  if (brief) {
+    courseModule = await db.course_modules.findByPk(id, {
+      include: { model: db.course_resources, attributes: { exclude: ['createdAt', 'updatedAt', 'url'] } },
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+    });
+  } else {
+    courseModule = await db.course_modules.findByPk(id, {
+      include: { model: db.course_resources, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+    });
+  }
   return courseModule;
 };
 

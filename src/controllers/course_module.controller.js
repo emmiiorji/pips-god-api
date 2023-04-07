@@ -16,8 +16,23 @@ const getCourseModules = catchAsync(async (req, res) => {
   res.send(result);
 });
 
+const getCourseModulesBrief = catchAsync(async (req, res) => {
+  const filter = pick(req.query, ['name', 'role']);
+  const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  const result = await courseModuleService.queryCourseModules(filter, options, true);
+  res.send(result);
+});
+
 const getCourseModule = catchAsync(async (req, res) => {
   const courseModule = await courseModuleService.getCourseModuleById(req.params.courseModuleId);
+  if (!courseModule) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Course Module not found');
+  }
+  res.send(courseModule);
+});
+
+const getCourseModuleBrief = catchAsync(async (req, res) => {
+  const courseModule = await courseModuleService.getCourseModuleById(req.params.courseModuleId, true);
   if (!courseModule) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Course Module not found');
   }
@@ -37,7 +52,9 @@ const deleteCourseModule = catchAsync(async (req, res) => {
 module.exports = {
   createCourseModule,
   getCourseModules,
+  getCourseModulesBrief,
   getCourseModule,
+  getCourseModuleBrief,
   updateCourseModule,
   deleteCourseModule,
 };
