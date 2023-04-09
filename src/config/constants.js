@@ -37,20 +37,25 @@ const tokenTypes = {
   VERIFY_EMAIL: 'verifyEmail',
 };
 
-const allRoles = {
-  user: [],
-  admin: ['getUsers', 'manageUsers', 'manageSubscriptions', 'manageTransactions'],
+const rolesAndRights = async () => {
+  // eslint-disable-next-line global-require
+  const { db } = require('../models');
+  const roles = await db.roles.findAll({ include: ['permissions'] });
+  const roleRights = new Map();
+  roles.forEach((role) => {
+    roleRights.set(
+      role.name,
+      role.permissions.map((p) => p.value)
+    );
+  });
+  return { roles: roles.map((role) => role.name), roleRights };
 };
-
-const roles = Object.keys(allRoles);
-const roleRights = new Map(Object.entries(allRoles));
 
 module.exports = {
   dateUnits,
   resourceTypes,
   notificationStatusTypes,
-  roles,
-  roleRights,
+  rolesAndRights,
   subscriptionNames,
   transactionStatuses,
   tokenTypes,

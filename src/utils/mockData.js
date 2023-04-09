@@ -73,18 +73,6 @@ const createSuperAdminUsers = async () => {
   });
 };
 
-const setSuperAdminPermissions = async () => {
-  const superAdminRole = await db.roles.findOne({ where: { name: 'super_admin' } });
-  const allPermissions = await db.permissions.findAll();
-  await superAdminRole.setPermissions(allPermissions);
-};
-
-const setAdminPermissions = async () => {
-  const adminRole = await db.roles.findOne({ where: { name: 'admin' } });
-  const allPermissions = await db.permissions.findAll({ where: { value: { [db.Op.notLike]: 'admin_user.%' } } });
-  await adminRole.setPermissions(allPermissions);
-};
-
 const createPermissions = async () => {
   const permissions = [
     {
@@ -92,12 +80,21 @@ const createPermissions = async () => {
       value: 'admin_user.create',
       description: 'Create an admin user',
       groupName: 'User Permissions',
+      roles: ['super_admin'],
     },
     {
       name: 'Manage Users',
       value: 'users.manage',
       description: 'Manage users',
       groupName: 'User Permissions',
+      roles: ['super_admin', 'admin'],
+    },
+    {
+      name: 'Manage Course Modules',
+      value: 'course_modules.manage',
+      description: 'Manage course modules',
+      groupName: 'Course Module Permissions',
+      roles: ['super_admin', 'admin'],
     },
   ];
 
@@ -110,15 +107,20 @@ const createPermissions = async () => {
     const filteredPermissions = permissions.filter(
       (permission) => !allPermissions.find((l) => l.dataValues.value === permission.value)
     );
-    filteredPermissions.forEach(async (permission) => {
-      // TODO: add permission service
-      await db.permissions.create(permission);
-    });
+    const createdPermissions = filteredPermissions.map((permission) => db.permissions.create(permission));
+    await Promise.all(createdPermissions);
     logger.info('permissions created');
   }
 
-  setSuperAdminPermissions();
-  setAdminPermissions();
+  const setPermissions = async (permission, roles) => {
+    const permissionInstance = await db.permissions.findOne({ where: { value: permission } });
+    const roleInstances = await db.roles.findAll({ where: { name: roles } });
+    await permissionInstance.setRoles(roleInstances);
+  };
+
+  permissions.forEach(async (permission) => {
+    await setPermissions(permission.value, permission.roles);
+  });
 };
 
 const createSeedCourses = async () => {
