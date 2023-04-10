@@ -15,6 +15,9 @@ module.exports = (sequelize, dataType) => {
       type: dataType.BOOLEAN,
       defaultValue: false,
     },
+    startedAt: {
+      type: dataType.DATE,
+    },
     completedAt: {
       type: dataType.DATE,
     },
