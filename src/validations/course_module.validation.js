@@ -46,6 +46,9 @@ const getCourseModule = {
   params: Joi.object().keys({
     courseModuleId: Joi.number().integer().required(),
   }),
+  body: Joi.object().keys({
+    role: Joi.string().default('admin'),
+  }),
 };
 
 const updateCourseModule = {

@@ -3,6 +3,7 @@ const auth = require('../../middlewares/auth');
 const validate = require('../../middlewares/validate');
 const courseModuleValidation = require('../../validations/course_module.validation');
 const courseModuleController = require('../../controllers/course_module.controller');
+const hasModuleAccess = require('../../middlewares/hasModuleAccess');
 
 const router = express.Router();
 
@@ -28,11 +29,7 @@ router
 
 router
   .route('/:courseModuleId')
-  .get(
-    auth('course_modules.manage'),
-    validate(courseModuleValidation.getCourseModule),
-    courseModuleController.getCourseModule
-  )
+  .get(auth(), validate(courseModuleValidation.getCourseModule), hasModuleAccess, courseModuleController.getCourseModule)
   .patch(
     auth('course_modules.manage'),
     validate(courseModuleValidation.updateCourseModule),

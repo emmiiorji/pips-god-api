@@ -8,11 +8,14 @@ const verifyCallback = (req, resolve, reject, requiredRights) => async (err, use
     return reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
   }
   req.user = user;
+  req.roles = user.roles.map((role) => role.name);
 
   if (requiredRights.length) {
     const { roleRights } = await rolesAndRights();
+    req.body.userRoles = [];
     const userRights = user.roles.reduce((acc, role) => {
       acc.push(...roleRights.get(role.name));
+      req.userRoles.push(role.name);
       return acc;
     }, []);
     const hasRequiredRights = requiredRights.every((requiredRight) => userRights.includes(requiredRight));
