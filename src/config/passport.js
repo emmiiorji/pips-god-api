@@ -13,6 +13,7 @@ const jwtVerify = async (payload, done) => {
     if (payload.type !== tokenTypes.ACCESS) {
       throw new Error('Invalid token type');
     }
+
     const user = await db.users.findByPk(payload.sub, { include: ['roles'] });
     if (!user) {
       return done(null, false);

@@ -57,16 +57,24 @@ const createSeedRoles = async () => {
 };
 
 const createSuperAdminUsers = async () => {
-  const superAdmins = await db.users.findAll({
-    include: [{ model: db.roles, where: { name: 'super_admin' } }],
-  });
-
-  if (superAdmins.length > 0) await db.users.destroy({ where: { id: superAdmins.map((user) => user.id) } });
   Object.values(superAdminUsers).forEach(async (user) => {
-    // const superAdmins = await db.users.findAll({ where: { [db.Op.or]: [{ username: user.username }, { email: user.email }] } });
+    const existingUser = await db.users.findOne({
+      where: { [db.Op.or]: [{ username: user.username }, { email: user.email }] },
+      include: ['roles'],
+    });
 
     // eslint-disable-next-line no-param-reassign
     user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
+
+    if (existingUser) {
+      logger.info(`User with username ${user.username} or email ${user.email} already exists`);
+      if (existingUser.roles.find((role) => role.name === 'super_admin')) {
+        logger.info(`User with username ${user.username} or email ${user.email} is already a super admin`);
+        logger.info('Changing Password...');
+        await existingUser.update({ password: user.password });
+      }
+      return;
+    }
     const newUser = await db.users.create(user);
     const superAdminRole = await db.roles.findOne({ where: { name: 'super_admin' } });
     await newUser.addRole(superAdminRole);
