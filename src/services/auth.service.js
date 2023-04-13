@@ -6,8 +6,10 @@ const tokenService = require('./token.service');
 const emailService = require('./email.service');
 const { db } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { tokenTypes } = require('../config/constants');
+const { tokenTypes, subscriptionNames } = require('../config/constants');
 const { bCrypt } = require('../config/config');
+const { enrollUserInCourse } = require('./course.service');
+const logger = require('../config/logger');
 
 /**
  * Login with username and password
@@ -16,12 +18,21 @@ const { bCrypt } = require('../config/config');
  * @returns {Promise<User>}
  */
 const loginUserWithEmailAndPassword = async (email, password) => {
-  const user = await db.users.findOne({ where: { email } });
+  const user = await db.users.findOne({
+    where: { email },
+    include: ['roles'],
+    attributes: { exclude: ['otpSecret'] },
+  });
   if (!user || !(await userService.isPasswordMatch(password, user))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
   }
+  user.roles = user.roles.map((role) => role.name);
+
+  // Force user to verify email of they are not an admin or superadmin
+  if (!user.roles.includes('user') && !user.isEmailVerified) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Please verify your email');
+  }
   delete user.dataValues.password;
-  delete user.dataValues.otpSecret;
   return user;
 };
 
@@ -130,6 +141,16 @@ const verifyEmail = async (verifyEmailToken, transactionId) => {
     throw new Error();
   }
   await db.transactions.update({ isUsed: true }, { where: { id: subscription.transactionId } });
+  const trainingAndMentoring = await db.courses.findOne({ where: { name: subscriptionNames.TRAINING_AND_MENTORING } });
+  const sequelizeTransaction = await db.sequelize.transaction();
+  try {
+    await enrollUserInCourse(trainingAndMentoring.id, subscription.userId, sequelizeTransaction);
+    await sequelizeTransaction.commit();
+  } catch (error) {
+    await sequelizeTransaction.rollback();
+    logger.error(error);
+    throw error;
+  }
   return user;
 };
 

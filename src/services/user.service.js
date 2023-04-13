@@ -115,7 +115,7 @@ const createUser = async (userBody) => {
       { transaction: sequelizeTransaction }
     );
 
-    // await db.transactions.update({ isUsed: true }, { where: { id: transaction.id }, transaction: sequelizeTransaction });
+    await db.transactions.update({ isUsed: true }, { where: { id: transaction.id }, transaction: sequelizeTransaction });
 
     await sequelizeTransaction.commit();
     delete userCreated.dataValues.password;

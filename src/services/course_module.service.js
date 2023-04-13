@@ -9,6 +9,36 @@ const titleExists = async (title) => {
   return courseModule;
 };
 
+// Will enroll users in a course module. Will enroll
+// const enrollUsersInCourseModules = async (courseModuleIds, userIds) => {
+//   const courseModules = await db.course_modules.findAll({ where: { id: courseModuleIds } });
+//   if (courseModules.length !== courseModuleIds.length) {
+//     const notFound = courseModuleIds.filter(
+//       (courseModuleId) => !courseModules.find((courseModule) => courseModule.id === courseModuleId)
+//     );
+//     throw new ApiError(httpStatus.NOT_FOUND, `COURSE_MODULES_[${notFound}]_NOT_FOUND`);
+//   }
+
+//   courseModules.forEach((courseModule) => {
+
+//   });
+//   const userCourseModule = await db.user_course_modules.findOne({
+//     where: { userId, courseModuleId },
+//   });
+
+//   // TODO: Modify this to allow users to re-enroll in a course module when subscription expires
+//   if (userCourseModule) {
+//     throw new ApiError(httpStatus.BAD_REQUEST, 'USER_ALREADY_ENROLLED_IN_COURSE_MODULE');
+//   }
+
+//   const createdUserCourseModule = await db.user_course_modules.create({
+//     userId,
+//     courseModuleId,
+//   });
+
+//   return createdUserCourseModule;
+// };
+
 const isResourceTypesUnique = (courseResources) => {
   // Check if there's a repeating resource type
   const types = courseResources.map((courseResource) => courseResource.type);
@@ -233,4 +263,5 @@ module.exports = {
   getCourseModuleById,
   updateCourseModuleById,
   deleteCourseModuleById,
+  // enrollUsersInCourseModules,
 };
