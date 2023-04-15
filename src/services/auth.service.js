@@ -121,7 +121,7 @@ const verifyEmail = async (verifyEmailToken, transactionId) => {
           'Your token seems to have expired. A new link has been sent to your mail'
         );
       }
-      throw new ApiError(httpStatus.ALREADY_REPORTED, 'Email already verified');
+      throw new ApiError(httpStatus.ALREADY_REPORTED, 'Transaction already used for subscription');
     } else {
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Email verification failed');
     }

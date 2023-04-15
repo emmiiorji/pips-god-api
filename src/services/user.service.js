@@ -12,7 +12,10 @@ const { generateAuthTokens } = require('./token.service');
  * @returns {Promise<boolean>}
  */
 const isEmailTaken = async function (email, role = false) {
-  const oldUser = await db.users.findOne({ where: { email }, include: [{ model: db.roles, attributes: ['name'] }] });
+  const oldUser = await db.users.findOne({
+    where: { email },
+    include: [{ model: db.roles, through: { model: db.user_roles, attributes: [] }, attributes: ['name'] }],
+  });
   const userRoles = oldUser ? oldUser.roles.map((r) => r.name) : [];
   logger.info(oldUser);
   return { emailTaken: userRoles.includes(role), userRoles, oldUser };
@@ -54,12 +57,17 @@ const createAdminUser = async (userBody) => {
   const userCreated = oldUser || (await db.users.create(user));
 
   const adminRole = await db.roles.findOne({ where: { name: 'admin' } });
-  await userCreated.addRole(adminRole);
+  await userCreated.addRole(adminRole, { returning: true });
 
-  delete userCreated.dataValues.password;
+  const updatedUser = await db.users.findOne({
+    where: { email: userCreated.email },
+    attributes: { exclude: ['password', 'otpSecret'] },
+    include: [{ model: db.roles, through: { model: db.user_roles, attributes: [] }, attributes: ['id', 'name'] }],
+  });
+
   const tokens = await generateAuthTokens(userCreated.id);
 
-  return { userCreated, tokens };
+  return { userCreated: updatedUser, tokens };
 };
 
 /**

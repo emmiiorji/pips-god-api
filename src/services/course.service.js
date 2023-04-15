@@ -13,7 +13,7 @@ const getCourseModulesOfCourse = async (courseId) => {
   return courseModuleIds;
 };
 
-const enrollUsersInCourses = async (courseId, userId, transaction, start = true) => {
+const enrollUserInCourse = async (courseId, userId, transaction, start = true) => {
   const course = await db.courses.findByPk(courseId);
   if (!course) {
     throw new ApiError(httpStatus.NOT_FOUND, 'COURSE_NOT_FOUND');
@@ -65,6 +65,6 @@ const enrollUsersInCourses = async (courseId, userId, transaction, start = true)
 };
 
 module.exports = {
-  enrollUsersInCourses,
+  enrollUserInCourse,
   getCourseModulesOfCourse,
 };
