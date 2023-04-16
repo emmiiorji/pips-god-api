@@ -41,7 +41,7 @@ const logout = catchAsync(async (req, res) => {
 
 const refreshTokens = catchAsync(async (req, res) => {
   const tokens = await authService.refreshAuth(req.body.refreshToken);
-  res.send({ ...tokens });
+  res.send({ data: { ...tokens }, message: 'Tokens refreshed successfully', code: 200 });
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
