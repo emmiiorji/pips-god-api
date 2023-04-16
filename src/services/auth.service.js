@@ -29,7 +29,7 @@ const loginUserWithEmailAndPassword = async (email, password) => {
   user.roles = user.roles.map((role) => role.name);
 
   // Force user to verify email of they are not an admin or superadmin
-  if (!user.roles.includes('user') && !user.isEmailVerified) {
+  if (user.roles.includes('user') && !user.isEmailVerified) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Please verify your email');
   }
   delete user.dataValues.password;
@@ -46,7 +46,7 @@ const logout = async (refreshToken) => {
   if (!refreshTokenDoc) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Not found');
   }
-  await refreshTokenDoc.remove();
+  await refreshTokenDoc.destroy();
 };
 
 /**
