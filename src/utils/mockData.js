@@ -104,6 +104,13 @@ const createPermissions = async () => {
       groupName: 'Course Module Permissions',
       roles: ['super_admin', 'admin'],
     },
+    {
+      name: 'Manage Contact Messages',
+      value: 'contact_messages.manage',
+      description: 'Manage contact us messages',
+      groupName: 'Contact Messages Permissions',
+      roles: ['super_admin', 'admin'],
+    },
   ];
 
   //   get existing permissions

@@ -46,6 +46,7 @@ db.course_resources = require('./course_resource.model')(sequelizeInstance, Sequ
 db.user_course_modules = require('./user_course_module.model')(sequelizeInstance, Sequelize);
 db.course_modules = require('./course_module.model')(sequelizeInstance, Sequelize);
 db.user_roles = require('./user_role.model')(sequelizeInstance, Sequelize);
+db.contact_messages = require('./contact_message.model')(sequelizeInstance, Sequelize);
 
 // relationships for models
 

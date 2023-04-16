@@ -26,7 +26,7 @@ const getMessageTemplates = {
 
 const getMessageTemplateById = {
   params: Joi.object().keys({
-    messageTemplateId: Joi.string().required(),
+    messageTemplateId: Joi.number().integer().required(),
   }),
 };
 

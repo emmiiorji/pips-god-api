@@ -5,3 +5,4 @@ module.exports.transactionValidation = require('./transaction.validation');
 module.exports.messageTemplateValidation = require('./message_template.validation');
 module.exports.messageTemplateVariableValidation = require('./variable.validation');
 module.exports.courseResourceValidation = require('./course_module.validation');
+module.exports.contactMessageValidation = require('./contact_message.validation');

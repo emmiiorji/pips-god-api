@@ -14,7 +14,7 @@ const getVariables = {
 
 const getVariable = {
   params: Joi.object().keys({
-    variableId: Joi.string().required(),
+    variableId: Joi.number().integer().required(),
   }),
 };
 

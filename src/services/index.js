@@ -5,3 +5,4 @@ module.exports.userService = require('./user.service');
 module.exports.subscriptionService = require('./subscription.service');
 module.exports.transactionService = require('./transaction.service');
 module.exports.courseModuleService = require('./course_module.service');
+module.exports.contactMessageService = require('./contact_message.service');
