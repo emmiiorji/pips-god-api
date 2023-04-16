@@ -6,6 +6,7 @@ const docsRoute = require('./docs.route');
 const config = require('../../config/config');
 const notificationRoute = require('./notification.route');
 const courseModuleRoute = require('./course_module.route');
+const contactMessageRoute = require('./contact_message.route');
 
 const router = express.Router();
 
@@ -29,6 +30,10 @@ const defaultRoutes = [
   {
     path: '/course_modules',
     route: courseModuleRoute,
+  },
+  {
+    path: '/contact_messages',
+    route: contactMessageRoute,
   },
 ];
 
