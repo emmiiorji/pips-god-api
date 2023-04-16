@@ -10,34 +10,42 @@ const titleExists = async (title) => {
 };
 
 // Will enroll users in a course module. Will enroll
-// const enrollUsersInCourseModules = async (courseModuleIds, userIds) => {
-//   const courseModules = await db.course_modules.findAll({ where: { id: courseModuleIds } });
-//   if (courseModules.length !== courseModuleIds.length) {
-//     const notFound = courseModuleIds.filter(
-//       (courseModuleId) => !courseModules.find((courseModule) => courseModule.id === courseModuleId)
-//     );
-//     throw new ApiError(httpStatus.NOT_FOUND, `COURSE_MODULES_[${notFound}]_NOT_FOUND`);
-//   }
+const enrollUsersInCourseModule = async (courseModuleId, userIds, transaction) => {
+  const courseModule = await db.course_modules.findOne({
+    where: { id: courseModuleId },
+    include: [{ model: db.course_resources }],
+  });
+  if (!courseModule) {
+    throw new ApiError(httpStatus.NOT_FOUND, `COURSE_MODULE_NOT_FOUND`);
+  }
+  const { courseId } = courseModule.course_resources[0];
 
-//   courseModules.forEach((courseModule) => {
+  const users = await db.users.findAll({
+    where: { id: userIds },
+    include: [{ model: db.courses, where: { id: courseId }, required: true }],
+  });
+  if (users.length !== userIds.length) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'ONE_OR_MORE_USERS_NOT_REGISTERED_FOR_COURSE_OF_COURSE_MODULE');
+  }
 
-//   });
-//   const userCourseModule = await db.user_course_modules.findOne({
-//     where: { userId, courseModuleId },
-//   });
+  const courseModuleUsers = await db.user_course_modules.findAll({
+    where: { userId: userIds, courseModuleId },
+  });
 
-//   // TODO: Modify this to allow users to re-enroll in a course module when subscription expires
-//   if (userCourseModule) {
-//     throw new ApiError(httpStatus.BAD_REQUEST, 'USER_ALREADY_ENROLLED_IN_COURSE_MODULE');
-//   }
+  if (courseModuleUsers.length) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'ONE_OR_MORE_USERS_ALREADY_ENROLLED_IN_COURSE_MODULE');
+  }
 
-//   const createdUserCourseModule = await db.user_course_modules.create({
-//     userId,
-//     courseModuleId,
-//   });
+  const createdCourseModuleUsers = await db.user_course_modules.bulkCreate(
+    userIds.map((userId) => ({
+      userId,
+      courseModuleId,
+    })),
+    { transaction }
+  );
 
-//   return createdUserCourseModule;
-// };
+  return createdCourseModuleUsers;
+};
 
 const isResourceTypesUnique = (courseResources) => {
   // Check if there's a repeating resource type
@@ -52,7 +60,9 @@ const isResourceTypesUnique = (courseResources) => {
 // Course Resource is created at the same time as the Course Module
 const createCourseModule = async (courseResourceBody) => {
   const { courseModule, courseResources } = courseResourceBody;
-  const featuredCourse = await db.courses.findByPk(courseModule.courseId);
+  const featuredCourse = await db.courses.findByPk(courseModule.courseId, {
+    include: [{ model: db.users, required: true }],
+  });
 
   if (!featuredCourse) {
     throw new ApiError(httpStatus.NOT_FOUND, 'COURSE_NOT_FOUND');
@@ -84,6 +94,8 @@ const createCourseModule = async (courseResourceBody) => {
       }),
       { transaction: sequelizeTransaction }
     );
+    const userIds = featuredCourse.users.map((user) => user.id);
+    await enrollUsersInCourseModule(createdCourseModule.id, userIds, sequelizeTransaction);
 
     await sequelizeTransaction.commit();
     return { ...courseModule, course_resources: createdCourseResources };
@@ -263,5 +275,5 @@ module.exports = {
   getCourseModuleById,
   updateCourseModuleById,
   deleteCourseModuleById,
-  // enrollUsersInCourseModules,
+  enrollUsersInCourseModule,
 };
