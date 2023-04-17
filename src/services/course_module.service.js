@@ -60,9 +60,7 @@ const isResourceTypesUnique = (courseResources) => {
 // Course Resource is created at the same time as the Course Module
 const createCourseModule = async (courseResourceBody) => {
   const { courseModule, courseResources } = courseResourceBody;
-  const featuredCourse = await db.courses.findByPk(courseModule.courseId, {
-    include: [{ model: db.users, required: true }],
-  });
+  const featuredCourse = await db.courses.findByPk(courseModule.courseId);
 
   if (!featuredCourse) {
     throw new ApiError(httpStatus.NOT_FOUND, 'COURSE_NOT_FOUND');
@@ -94,14 +92,22 @@ const createCourseModule = async (courseResourceBody) => {
       }),
       { transaction: sequelizeTransaction }
     );
-    const userIds = featuredCourse.users.map((user) => user.id);
-    await enrollUsersInCourseModule(createdCourseModule.id, userIds, sequelizeTransaction);
-
+    const subscriptions = await db.subscriptions.findAll({
+      include: {
+        model: db.subscription_plans,
+        include: { model: db.courses, where: { id: featuredCourse.id }, required: true },
+      },
+    });
+    const userIds = subscriptions.map((subscription) => subscription.userId);
     await sequelizeTransaction.commit();
+    if (userIds.length) {
+      await enrollUsersInCourseModule(createdCourseModule.id, userIds);
+    }
+
     return { ...courseModule, course_resources: createdCourseResources };
   } catch (error) {
-    await sequelizeTransaction.rollback();
     logger.error(error);
+    await sequelizeTransaction.rollback();
     if (error === 'VIDEO_THUMBNAIL_REQUIRED') {
       throw new ApiError(httpStatus.BAD_REQUEST, error);
     }
