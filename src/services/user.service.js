@@ -101,15 +101,13 @@ const createUser = async (userBody) => {
   let userCreated;
   if (userRoles.length < 1) {
     user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
-    userCreated = oldUser || (await db.users.create(user));
   }
-  // user.password = bcrypt.hashSync(user.password, bCrypt.salt || 10);
 
   let sequelizeTransaction;
   try {
     // Use a transaction to create the user and subscription
     sequelizeTransaction = await db.sequelize.transaction();
-    userCreated = userCreated || (await db.users.create(user, { transaction: sequelizeTransaction }));
+    userCreated = oldUser || (await db.users.create(user, { transaction: sequelizeTransaction }));
     const subscriptionPlan = await db.subscription_plans.findByPk(transaction.subscriptionPlanId);
 
     await userCreated.addRole(userRole.id, { transaction: sequelizeTransaction });
@@ -131,6 +129,7 @@ const createUser = async (userBody) => {
   } catch (error) {
     if (sequelizeTransaction) await sequelizeTransaction.rollback();
     logger.error(error);
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Error creating user');
   }
 };
 
@@ -215,7 +214,6 @@ const updateUserById = async (userId, updateBody) => {
   }
   Object.assign(user, updateBody);
   await user.save();
-  // await db.users.update(updateBody, { where: { id: userId } });
   return user;
 };
 
