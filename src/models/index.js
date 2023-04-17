@@ -86,7 +86,7 @@ db.course_resources.belongsTo(db.courses);
 
 // user to course module m-m
 db.users.belongsToMany(db.course_modules, { through: db.user_course_modules });
-db.course_resources.belongsToMany(db.users, { through: db.user_course_modules });
+db.course_modules.belongsToMany(db.users, { through: db.user_course_modules });
 
 // course_module to user_course_module 1-m
 db.user_course_modules.belongsTo(db.course_modules);
