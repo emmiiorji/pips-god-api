@@ -20,7 +20,7 @@ const logger = require('../config/logger');
 const loginUserWithEmailAndPassword = async (email, password) => {
   const user = await db.users.findOne({
     where: { email },
-    include: ['roles'],
+    include: { model: db.roles, as: 'roles', attributes: ['name'], through: { attributes: [] } },
     attributes: { exclude: ['otpSecret'] },
   });
   if (!user || !(await userService.isPasswordMatch(password, user))) {

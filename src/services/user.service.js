@@ -174,7 +174,10 @@ const queryUsers = async (filter, options) => {
  * @returns {Promise<User>}
  */
 const getUserById = async (id) => {
-  const user = await db.users.findByPk(id, { include: { model: db.roles, attributes: ['name'] } });
+  const user = await db.users.findByPk(id, {
+    include: { model: db.roles, attributes: ['name'], through: { attributes: [] } },
+    attributes: { exclude: ['otpSecret', 'password'] },
+  });
   return user;
 };
 
@@ -211,7 +214,8 @@ const updateUserById = async (userId, updateBody) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
   Object.assign(user, updateBody);
-  await db.users.update(user, { where: { id: userId } });
+  await user.save();
+  // await db.users.update(updateBody, { where: { id: userId } });
   return user;
 };
 

@@ -11,15 +11,15 @@ const verifyCallback = (req, resolve, reject, requiredRights) => async (err, use
   req.roles = user.roles.map((role) => role.name);
 
   // Force user to verify email of they are not an admin or superadmin
-  if (!req.roles.includes('user') && !user.isEmailVerified) {
+  if (req.roles.includes('user') && !user.isEmailVerified) {
     return reject(new ApiError(httpStatus.FORBIDDEN, 'Please verify your email'));
   }
 
   if (requiredRights.length) {
-    const { roleRights } = await rolesAndRights();
-    req.body.userRoles = [];
+    const { roleRights: rolesRights } = await rolesAndRights();
+    req.userRoles = [];
     const userRights = user.roles.reduce((acc, role) => {
-      acc.push(...roleRights.get(role.name));
+      acc.push(...rolesRights.get(role.name));
       req.userRoles.push(role.name);
       return acc;
     }, []);

@@ -118,7 +118,7 @@ const createCourseModule = async (courseResourceBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryCourseModules = async (filter, options, brief = false) => {
+const queryCourseModules = async (filter, options, userId, brief = false) => {
   if (options.sortBy !== undefined) {
     const [sortBy, direction] = options.sortBy.split(':');
     if (!Object.keys(db.course_resources.rawAttributes).includes(sortBy)) {
@@ -136,16 +136,26 @@ const queryCourseModules = async (filter, options, brief = false) => {
     courseResources = await db.course_modules.paginate({
       where: filter,
       ...options,
-      include: { model: db.course_resources, attributes: { exclude: ['createdAt', 'updatedAt', 'url'] } },
+      include: [
+        { model: db.course_resources, attributes: { exclude: ['createdAt', 'updatedAt', 'url'] } },
+        {
+          model: db.users,
+          through: {
+            model: db.user_course_modules,
+            // attributes: ['isCompleted', 'completedAt', 'isStarted', 'startedAt'],
+          },
+          where: { userId, required: true },
+        },
+      ],
       attributes: { exclude: ['createdAt', 'updatedAt'] },
-    }); // .paginate(filter, options);
+    });
   } else {
     courseResources = await db.course_modules.paginate({
       where: filter,
       ...options,
       include: { model: db.course_resources, attributes: { exclude: ['createdAt', 'updatedAt'] } },
       attributes: { exclude: ['createdAt', 'updatedAt'] },
-    }); // .paginate(filter, options);
+    });
   }
   return courseResources;
 };

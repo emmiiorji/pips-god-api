@@ -1,6 +1,6 @@
 const Joi = require('joi');
 const moment = require('moment');
-const { password, objectId } = require('./custom.validation');
+const { password } = require('./custom.validation');
 
 const isEmailTaken = {
   body: Joi.object().keys({
@@ -35,26 +35,29 @@ const getUsers = {
 
 const getUser = {
   params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
+    userId: Joi.string(),
   }),
 };
 
 const updateUser = {
   params: Joi.object().keys({
-    userId: Joi.required().custom(objectId),
+    userId: Joi.required(),
   }),
   body: Joi.object()
     .keys({
       email: Joi.string().email(),
       password: Joi.string().custom(password),
-      name: Joi.string(),
+      firstName: Joi.string(),
+      lastName: Joi.string(),
+      middleName: Joi.string(),
+      phone: Joi.string(),
     })
     .min(1),
 };
 
 const deleteUser = {
   params: Joi.object().keys({
-    userId: Joi.string().custom(objectId),
+    userId: Joi.string(),
   }),
 };
 

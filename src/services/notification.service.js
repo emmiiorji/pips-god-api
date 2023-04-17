@@ -46,7 +46,7 @@ const updateNotificationById = async (id, updateBody) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'Notification not found');
   }
   Object.assign(notification, updateBody);
-  await db.notifications.update(notification, { where: { id } });
+  notification.save();
   return notification;
 };
 
