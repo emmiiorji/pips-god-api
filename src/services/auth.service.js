@@ -6,7 +6,7 @@ const tokenService = require('./token.service');
 const emailService = require('./email.service');
 const { db } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { tokenTypes, subscriptionNames } = require('../config/constants');
+const { tokenTypes } = require('../config/constants');
 const { bCrypt } = require('../config/config');
 const { enrollUserInCourse } = require('./course.service');
 const logger = require('../config/logger');
@@ -100,7 +100,10 @@ const resetPassword = async (resetPasswordToken, requestBody) => {
  * @returns {Promise}
  */
 const verifyEmail = async (verifyEmailToken, transactionId) => {
-  const transaction = await db.transactions.findOne({ where: { id: transactionId } });
+  const transaction = await db.transactions.findOne({
+    where: { id: transactionId },
+    include: { model: db.subscription_plans, include: db.courses },
+  });
   let user;
   try {
     const verifyEmailTokenDoc = await tokenService.verifyToken(verifyEmailToken, tokenTypes.VERIFY_EMAIL);
@@ -143,10 +146,9 @@ const verifyEmail = async (verifyEmailToken, transactionId) => {
     throw new Error();
   }
   await db.transactions.update({ isUsed: true }, { where: { id: subscription.transactionId } });
-  const trainingAndMentoring = await db.courses.findOne({ where: { name: subscriptionNames.TRAINING_AND_MENTORING } });
   const sequelizeTransaction = await db.sequelize.transaction();
   try {
-    await enrollUserInCourse(trainingAndMentoring.id, subscription.userId, sequelizeTransaction);
+    await enrollUserInCourse(transaction.subscription_plan.course.id, subscription.userId, sequelizeTransaction);
     await sequelizeTransaction.commit();
   } catch (error) {
     await sequelizeTransaction.rollback();

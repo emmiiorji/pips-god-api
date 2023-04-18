@@ -84,7 +84,10 @@ const createUser = async (userBody) => {
 
   // TODO: If role is admin, check if user is admin or superadmin
 
-  const transaction = await db.transactions.findOne({ where: { id: transactionId } });
+  const transaction = await db.transactions.findOne({
+    where: { id: transactionId },
+    include: { model: db.subscription_plans, include: db.courses },
+  });
   if (!transaction) throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Invalid transaction ID');
 
   if (transaction.status !== 'success') throw new ApiError(httpStatus.PAYMENT_REQUIRED, 'Please, complete your order');
