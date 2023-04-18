@@ -10,7 +10,7 @@ const getCourseModulesOfCourse = async (courseId) => {
   });
   const courseModuleIds = courseResources.map((courseResource) => courseResource.courseModuleId);
 
-  return courseModuleIds;
+  return [...new Set(courseModuleIds)];
 };
 
 const enrollUserInCourse = async (courseId, userId, transaction, start = true) => {
