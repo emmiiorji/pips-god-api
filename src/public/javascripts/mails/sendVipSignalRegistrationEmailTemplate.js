@@ -34,7 +34,7 @@ module.exports = (firstName, planTitle, telegramGroupUrl) => {
     
             <tr>
               <td style="padding:0 10%;text-align:justify;">
-                <table style="border-spacing: 0;">
+                <table style="border-spacing: 0; width: 100%">
                   <tr>
                     <td style="padding: 0;">
                       <p style="margin-top: 50px;">Hi ${firstName || 'User'},</p>
