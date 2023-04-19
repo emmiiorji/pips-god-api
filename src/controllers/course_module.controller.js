@@ -19,7 +19,7 @@ const getCourseModules = catchAsync(async (req, res) => {
 const getCourseModulesBrief = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['name', 'role']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-  const result = await courseModuleService.queryCourseModules(filter, options, req.user.id, true);
+  const result = await courseModuleService.queryCourseModules(filter, options, req, true);
   res.send(result);
 });
 

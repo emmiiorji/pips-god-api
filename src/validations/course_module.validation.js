@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { resourceTypes } = require('../config/constants');
+const { resourceTypes, subscriptionNames } = require('../config/constants');
 const { tags } = require('./custom.validation');
 
 const createCourseModule = {
@@ -32,6 +32,9 @@ const createCourseModule = {
 
 const getCourseModules = {
   query: Joi.object().keys({
+    subscriptionPlanName: Joi.string()
+      .valid(...Object.values(subscriptionNames))
+      .default(subscriptionNames.TRAINING_AND_MENTORING),
     description: Joi.string(),
     title: Joi.string(),
     tags: Joi.string().custom(tags),

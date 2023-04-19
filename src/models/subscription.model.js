@@ -32,6 +32,10 @@ module.exports = (sequelize, dataType) => {
       type: dataType.STRING,
       defaultValue: dateUnits.DAYS,
     },
+    count: {
+      type: dataType.INTEGER,
+      defaultValue: 1,
+    },
   });
 
   sequelizePaginate.paginate(subscription);

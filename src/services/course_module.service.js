@@ -1,4 +1,5 @@
 const httpStatus = require('http-status');
+const moment = require('moment');
 const ApiError = require('../utils/ApiError');
 const { db } = require('../models');
 const logger = require('../config/logger');
@@ -115,6 +116,32 @@ const createCourseModule = async (courseResourceBody) => {
   }
 };
 
+const hasValidSubscription = async ({ subscriptionPlanName, subscriptionPlanId, userId }) => {
+  const subscription = await db.subscriptions.findOne({
+    where: {
+      userId,
+      // createdAt: {
+      //   [db.Op.gte]: moment().subtract(db.Sequelize.col('validity'), db.Sequelize.col('validityUnit')).toDate(),
+      // },
+    },
+    include: {
+      model: db.subscription_plans,
+      where: subscriptionPlanId ? { id: subscriptionPlanId } : { name: subscriptionPlanName },
+      required: true,
+    },
+  });
+  if (!subscription) return false;
+
+  const isSubscriptionActive =
+    subscription.createdAt > moment().subtract(subscription.validity, subscription.validityUnit).toDate();
+  if (subscription.isValid && !isSubscriptionActive) {
+    Object.assign(subscription, { isValid: false });
+    await subscription.save();
+  }
+
+  return isSubscriptionActive;
+};
+
 /**
  * Query for users
  * @param {Object} filter - Mongo filter
@@ -124,7 +151,7 @@ const createCourseModule = async (courseResourceBody) => {
  * @param {number} [options.page] - Current page (default = 1)
  * @returns {Promise<QueryResult>}
  */
-const queryCourseModules = async (filter, options, userId, brief = false) => {
+const queryCourseModules = async (filter, options, req, brief = false) => {
   if (options.sortBy !== undefined) {
     const [sortBy, direction] = options.sortBy.split(':');
     if (!Object.keys(db.course_resources.rawAttributes).includes(sortBy)) {
@@ -139,6 +166,10 @@ const queryCourseModules = async (filter, options, userId, brief = false) => {
   }
   let courseResources;
   if (brief) {
+    const subscriptionIsActive = await hasValidSubscription({
+      userId: req.user.id,
+      subscriptionPlanName: req.query.subscriptionPlanName,
+    });
     courseResources = await db.course_modules.paginate({
       where: filter,
       ...options,
@@ -150,11 +181,14 @@ const queryCourseModules = async (filter, options, userId, brief = false) => {
             model: db.user_course_modules,
             // attributes: ['isCompleted', 'completedAt', 'isStarted', 'startedAt'],
           },
-          where: { userId, required: true },
+          where: { id: req.user.id },
+          attributes: ['id'],
+          required: true,
         },
       ],
       attributes: { exclude: ['createdAt', 'updatedAt'] },
     });
+    courseResources.userSubscribed = subscriptionIsActive;
   } else {
     courseResources = await db.course_modules.paginate({
       where: filter,
