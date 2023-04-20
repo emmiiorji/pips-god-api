@@ -17,7 +17,7 @@ const logger = require('../config/logger');
  * @param {string} password
  * @returns {Promise<User>}
  */
-const loginUserWithEmailAndPassword = async (email, password) => {
+const loginUserWithEmailAndPassword = async (email, password, userRole) => {
   const user = await db.users.findOne({
     where: { email },
     include: { model: db.roles, as: 'roles', attributes: ['name'], through: { attributes: [] } },
@@ -28,8 +28,10 @@ const loginUserWithEmailAndPassword = async (email, password) => {
   }
   user.roles = user.roles.map((role) => role.name);
 
+  if (!user.roles.includes(userRole)) throw new ApiError(httpStatus.FORBIDDEN, `You don't have ${userRole} role`);
+
   // Force user to verify email of they are not an admin or superadmin
-  if (user.roles.includes('user') && !user.isEmailVerified) {
+  if (userRole === 'user' && !user.isEmailVerified) {
     throw new ApiError(httpStatus.FORBIDDEN, 'Please verify your email');
   }
   delete user.dataValues.password;

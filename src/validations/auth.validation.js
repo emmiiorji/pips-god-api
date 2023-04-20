@@ -49,6 +49,7 @@ const login = {
   body: Joi.object().keys({
     email: Joi.string().required(),
     password: Joi.string().required(),
+    userRole: Joi.string().trim(),
   }),
 };
 
