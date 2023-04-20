@@ -13,7 +13,7 @@ const getContactMessages = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['name', 'role']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await contactMessageService.queryContactMessages(filter, options);
-  res.send(result);
+  res.status(httpStatus.OK).send(result);
 });
 
 const getContactMessage = catchAsync(async (req, res) => {
@@ -21,7 +21,7 @@ const getContactMessage = catchAsync(async (req, res) => {
   if (!contactMessage) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Contact Message not found');
   }
-  res.send(contactMessage);
+  res.status(httpStatus.OK).send(contactMessage);
 });
 
 const updateContactMessage = catchAsync(async (req, res) => {
@@ -31,7 +31,7 @@ const updateContactMessage = catchAsync(async (req, res) => {
 
 const deleteContactMessage = catchAsync(async (req, res) => {
   await contactMessageService.deleteContactMessageById(req.params.contactMessageId);
-  res.status(httpStatus.NO_CONTENT).send();
+  res.status(httpStatus.OK).status(httpStatus.NO_CONTENT).send();
 });
 
 module.exports = {

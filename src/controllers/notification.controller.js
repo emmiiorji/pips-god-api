@@ -13,7 +13,7 @@ const getNotifications = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['status', 'userId']);
   const options = pick(req.query, ['sortBy', 'direction', 'limit', 'page']);
   const result = await notificationService.queryNotifications(filter, options);
-  res.send(result);
+  res.status(httpStatus.OK).send(result);
 });
 
 const getNotification = catchAsync(async (req, res) => {
@@ -21,17 +21,17 @@ const getNotification = catchAsync(async (req, res) => {
   if (!notification) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Notification not found');
   }
-  res.send(notification);
+  res.status(httpStatus.OK).send(notification);
 });
 
 const updateNotification = catchAsync(async (req, res) => {
   const notification = await notificationService.updateNotificationById(req.params.notificationId, req.body);
-  res.send(notification);
+  res.status(httpStatus.OK).send(notification);
 });
 
 const deleteNotification = catchAsync(async (req, res) => {
   await notificationService.deleteNotificationById(req.params.notificationId);
-  res.status(httpStatus.NO_CONTENT).send();
+  res.status(httpStatus.OK).status(httpStatus.NO_CONTENT).send();
 });
 
 module.exports = {

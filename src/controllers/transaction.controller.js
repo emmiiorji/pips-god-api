@@ -26,7 +26,7 @@ const getTransactions = catchAsync(async (req, res) => {
   const options = pick(req.query, ['sortBy', 'direction', 'limit', 'page']);
 
   const transactions = await transactionService.queryTransactions(filter, options);
-  res.send(transactions);
+  res.status(httpStatus.OK).send(transactions);
 });
 
 const getTransactionByReference = catchAsync(async (req, res) => {
@@ -34,7 +34,7 @@ const getTransactionByReference = catchAsync(async (req, res) => {
   if (!transaction) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Transaction not found');
   }
-  res.send(transaction);
+  res.status(httpStatus.OK).send(transaction);
 });
 
 module.exports = {

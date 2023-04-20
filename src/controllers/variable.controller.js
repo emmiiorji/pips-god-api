@@ -30,7 +30,7 @@ const updateVariableById = catchAsync(async (req, res) => {
 
 const deleteVariableById = catchAsync(async (req, res) => {
   await variableService.deleteVariableById(req.params.variableId);
-  res.status(httpStatus.NO_CONTENT).send();
+  res.status(httpStatus.OK).send();
 });
 
 module.exports = {

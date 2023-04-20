@@ -31,7 +31,7 @@ const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   const user = await authService.loginUserWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user.dataValues.id);
-  res.send({ user, tokens });
+  res.status(httpStatus.OK).send({ user, tokens });
 });
 
 const logout = catchAsync(async (req, res) => {
@@ -41,7 +41,7 @@ const logout = catchAsync(async (req, res) => {
 
 const refreshTokens = catchAsync(async (req, res) => {
   const tokens = await authService.refreshAuth(req.body.refreshToken);
-  res.send({ data: { ...tokens }, message: 'Tokens refreshed successfully', code: 200 });
+  res.status(httpStatus.OK).send({ data: { ...tokens }, message: 'Tokens refreshed successfully', code: 200 });
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
@@ -59,7 +59,7 @@ const resetPassword = catchAsync(async (req, res) => {
 const sendVerificationEmail = catchAsync(async (req, res) => {
   const verifyEmailToken = await tokenService.generateVerifyEmailToken(req.user);
   await emailService.sendVerificationEmail(req.user.email, verifyEmailToken);
-  res.status(httpStatus.NO_CONTENT).send();
+  res.status(httpStatus.OK).send();
 });
 
 const verifyEmail = catchAsync(async (req, res) => {
