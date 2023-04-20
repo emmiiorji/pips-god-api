@@ -29,12 +29,13 @@ const getUserByEmail = async (email) => {
  * @param {string} [secret]
  * @returns {string}
  */
-const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
+const generateToken = (userId, expires, type, userRole, secret = config.jwt.secret) => {
   const payload = {
     sub: userId,
     iat: moment().unix(),
     exp: expires.unix(),
     type,
+    userRole,
   };
   return jwt.sign(payload, secret);
 };
@@ -95,12 +96,12 @@ const verifyOTP = async (token, email) => {
  * @param {User} user
  * @returns {Promise<Object>}
  */
-const generateAuthTokens = async (user) => {
+const generateAuthTokens = async (user, userRole) => {
   const accessTokenExpires = moment().add(config.jwt.accessExpirationMinutes, 'minutes');
-  const accessToken = generateToken(user, accessTokenExpires, tokenTypes.ACCESS);
+  const accessToken = generateToken(user, accessTokenExpires, tokenTypes.ACCESS, userRole);
 
   const refreshTokenExpires = moment().add(config.jwt.refreshExpirationDays, 'days');
-  const refreshToken = generateToken(user, refreshTokenExpires, tokenTypes.REFRESH);
+  const refreshToken = generateToken(user, refreshTokenExpires, tokenTypes.REFRESH, userRole);
   await saveToken(refreshToken, user, refreshTokenExpires, tokenTypes.REFRESH);
 
   return {
