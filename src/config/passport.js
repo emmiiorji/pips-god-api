@@ -15,6 +15,7 @@ const jwtVerify = async (payload, done) => {
     }
 
     const user = await db.users.findByPk(payload.sub, { include: ['roles'] });
+    user.userRole = payload.userRole;
     if (!user) {
       return done(null, false);
     }

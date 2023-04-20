@@ -94,10 +94,18 @@ const createCourseModule = async (courseResourceBody) => {
       { transaction: sequelizeTransaction }
     );
     const subscriptions = await db.subscriptions.findAll({
-      include: {
-        model: db.subscription_plans,
-        include: { model: db.courses, where: { id: featuredCourse.id }, required: true },
-      },
+      include: [
+        {
+          model: db.subscription_plans,
+          include: {
+            model: db.courses,
+            where: { id: featuredCourse.id },
+            required: true,
+            include: { model: db.users, required: true },
+          },
+          required: true,
+        },
+      ],
     });
     const userIds = subscriptions.map((subscription) => subscription.userId);
     await sequelizeTransaction.commit();

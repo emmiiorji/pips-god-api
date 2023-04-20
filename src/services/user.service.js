@@ -236,25 +236,11 @@ const deleteUserById = async (userId) => {
 
 const getUsersDashboard = async (reqQuery) => {
   const { startDate, endDate } = reqQuery;
-  // let usersByRoles = await db.users.findAll({
-  //   include: [
-  //     {
-  //       model: db.roles,
-  //       attributes: ['name'],
-  //       required: true,
-  //     },
-  //   ],
-  //   where: {
-  //     createdAt: { [db.Op.between]: [startDate, db.Sequelize.literal(`DATE_ADD('${endDate}', INTERVAL 1 DAY)`)] },
-  //   },
-  //   attributes: [[db.Sequelize.fn('COUNT', 'userId'), 'userCount']],
-  //   group: ['roleId'],
-  // });
-  // usersByRoles = usersByRoles.map((role) => {
-  //   return { role: role.roles[0].name, userCount: role.dataValues.userCount };
-  // });
 
   // ToDO: Create a job to monitor the validity of the subscription and update the isValid field
+
+  // All users that are still active.
+  // A user is active if they have a valid subscription or their subscription has not expired for more than 30days
   const activeUsersAndPlans = await db.users.findAll({
     include: [
       {
@@ -306,12 +292,6 @@ const getUsersDashboard = async (reqQuery) => {
     acc[`${sub.userId} ${sub.subscription_plan.name}`].amounts.push(sub.transaction.amount);
     return acc;
   }, {});
-
-  // console.log(userPlanAmounts);
-
-  // const completedMentorship = userPlanAmounts; // .filter(
-  //   (user) => user.courses.filter((course) => course.user_course.isCompleted).length > 0
-  // );
 
   const completedTrainingAndMentoring = usersAndCourses.reduce(
     (acc, user) => {
