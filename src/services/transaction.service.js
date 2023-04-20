@@ -69,7 +69,7 @@ const initializeTransaction = async (transactionBody, isRenew = false) => {
     if (user && !isRenew) throw new ApiError(httpStatus.IM_USED, 'User with telegram username already exists');
 
     user = await db.users.findOne({ where: { email }, include: [{ model: db.roles, attributes: ['name'] }] });
-    const userRoles = user.roles.map((role) => role.name);
+    const userRoles = user ? user.roles.map((role) => role.name) : [];
     if (userRoles.includes('user') && !isRenew)
       throw new ApiError(httpStatus.ALREADY_REPORTED, 'User with email already exists');
   }
