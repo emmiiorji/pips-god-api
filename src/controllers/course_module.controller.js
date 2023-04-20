@@ -13,14 +13,14 @@ const getCourseModules = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['name', 'role']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await courseModuleService.queryCourseModules(filter, options);
-  res.send(result);
+  res.status(httpStatus.OK).send(result);
 });
 
 const getCourseModulesBrief = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['name', 'role']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
   const result = await courseModuleService.queryCourseModules(filter, options, req, true);
-  res.send(result);
+  res.status(httpStatus.OK).send(result);
 });
 
 const getCourseModule = catchAsync(async (req, res) => {
@@ -28,7 +28,7 @@ const getCourseModule = catchAsync(async (req, res) => {
   if (!courseModule) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Course Module not found');
   }
-  res.send(courseModule);
+  res.status(httpStatus.OK).send(courseModule);
 });
 
 const getCourseModuleBrief = catchAsync(async (req, res) => {
@@ -36,12 +36,12 @@ const getCourseModuleBrief = catchAsync(async (req, res) => {
   if (!courseModule) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Course Module not found');
   }
-  res.send(courseModule);
+  res.status(httpStatus.OK).send(courseModule);
 });
 
 const updateCourseModule = catchAsync(async (req, res) => {
   const courseModule = await courseModuleService.updateCourseModuleById(req.params.courseModuleId, req.body);
-  res.send(courseModule);
+  res.status(httpStatus.OK).send(courseModule);
 });
 
 const deleteCourseModule = catchAsync(async (req, res) => {
