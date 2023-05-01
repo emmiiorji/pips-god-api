@@ -17,7 +17,7 @@ const hasModuleAccess = async (req, res, next) => {
       ],
     });
     if (!userCourseModules) {
-      next(new ApiError(httpStatus.FORBIDDEN, 'NOT_STARTED'));
+      return next(new ApiError(httpStatus.FORBIDDEN, 'NOT_STARTED'));
     }
 
     // TODO: Create a middleware to run check if user subscription is active
