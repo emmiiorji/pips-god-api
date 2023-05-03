@@ -6,7 +6,7 @@ const hasModuleAccess = async (req, res, next) => {
   if (!req.roles.includes(req.query.role)) {
     next(new ApiError(httpStatus.FORBIDDEN, `NOT_${req.query.role.toUpperCase()}`));
   }
-  if (req.roles.includes('user')) {
+  if (req.query.role === 'user') {
     const userCourseModules = await db.user_course_modules.findOne({
       where: { userId: req.user.id, courseModuleId: req.params.courseModuleId, isStarted: true },
       include: [
