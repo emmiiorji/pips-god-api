@@ -113,12 +113,12 @@ const createCourseModule = async (courseResourceBody) => {
     await sequelizeTransaction.commit();
     if (userIds.length) {
       // If it's the first course, mark it as started for the users
-      const countCourseModules = await db.course_modules.count({ where: { courseId: featuredCourse.id } });
-      logger.info(countCourseModules);
+      // const countCourseModules = await db.course_modules.count({ where: { courseId: featuredCourse.id } });
+      // logger.info(countCourseModules);
       await enrollUsersInCourseModule({
         courseModuleId: createdCourseModule.id,
         userIds,
-        isStarted: countCourseModules === 1 || false,
+        // isStarted: countCourseModules === 1 || false,
       });
     }
 
