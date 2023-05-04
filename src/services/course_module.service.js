@@ -11,7 +11,7 @@ const titleExists = async (title) => {
 };
 
 // Will enroll users in a course module. Will enroll
-const enrollUsersInCourseModule = async (courseModuleId, userIds, transaction) => {
+const enrollUsersInCourseModule = async ({ courseModuleId, userIds, transaction, isStarted = false } = {}) => {
   const courseModule = await db.course_modules.findOne({
     where: { id: courseModuleId },
     include: [{ model: db.course_resources }],
@@ -41,6 +41,8 @@ const enrollUsersInCourseModule = async (courseModuleId, userIds, transaction) =
     userIds.map((userId) => ({
       userId,
       courseModuleId,
+      isStarted,
+      startedAt: isStarted ? moment().toISOString() : null,
     })),
     { transaction }
   );
@@ -110,7 +112,13 @@ const createCourseModule = async (courseResourceBody) => {
     const userIds = subscriptions.map((subscription) => subscription.userId);
     await sequelizeTransaction.commit();
     if (userIds.length) {
-      await enrollUsersInCourseModule(createdCourseModule.id, userIds);
+      // If it's the first course, mark it as started for the users
+      const countCourseModules = (await db.course_modules.count({ where: { courseId: featuredCourse.id } })) === 1;
+      await enrollUsersInCourseModule({
+        courseModuleId: createdCourseModule.id,
+        userIds,
+        isStarted: !countCourseModules || false,
+      });
     }
 
     return { ...courseModule, course_resources: createdCourseResources };
