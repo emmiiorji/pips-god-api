@@ -114,6 +114,7 @@ const createCourseModule = async (courseResourceBody) => {
     if (userIds.length) {
       // If it's the first course, mark it as started for the users
       const countCourseModules = (await db.course_modules.count({ where: { courseId: featuredCourse.id } })) === 1;
+      logger.info(countCourseModules);
       await enrollUsersInCourseModule({
         courseModuleId: createdCourseModule.id,
         userIds,
