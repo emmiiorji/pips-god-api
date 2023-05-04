@@ -117,7 +117,7 @@ const createCourseModule = async (courseResourceBody) => {
       await enrollUsersInCourseModule({
         courseModuleId: createdCourseModule.id,
         userIds,
-        isStarted: !countCourseModules || false,
+        isStarted: countCourseModules || false,
       });
     }
 
