@@ -6,7 +6,7 @@ const { courseModuleService } = require('../services');
 
 const createCourseModule = catchAsync(async (req, res) => {
   const courseModule = await courseModuleService.createCourseModule(req.body);
-  res.status(httpStatus.CREATED).send({ data: courseModule, status: 200 });
+  res.status(httpStatus.CREATED).send({ data: courseModule, status: 201 });
 });
 
 const getCourseModules = catchAsync(async (req, res) => {
@@ -41,7 +41,7 @@ const getCourseModuleBrief = catchAsync(async (req, res) => {
 
 const updateCourseModule = catchAsync(async (req, res) => {
   const courseModule = await courseModuleService.updateCourseModuleById(req.params.courseModuleId, req.body);
-  res.status(httpStatus.OK).send(courseModule);
+  res.status(httpStatus.OK).send({ data: courseModule, status: 201 });
 });
 
 const deleteCourseModule = catchAsync(async (req, res) => {
