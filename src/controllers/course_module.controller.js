@@ -41,7 +41,7 @@ const getCourseModuleBrief = catchAsync(async (req, res) => {
 
 const updateCourseModule = catchAsync(async (req, res) => {
   const courseModule = await courseModuleService.updateCourseModuleById(req.params.courseModuleId, req.body);
-  res.status(httpStatus.OK).send({ data: courseModule, status: 201 });
+  res.status(httpStatus.OK).send({ data: courseModule, status: 200 });
 });
 
 const deleteCourseModule = catchAsync(async (req, res) => {
