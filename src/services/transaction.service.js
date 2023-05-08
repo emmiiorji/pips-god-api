@@ -70,8 +70,13 @@ const initializeTransaction = async (transactionBody, isRenew = false) => {
 
     user = await db.users.findOne({ where: { email }, include: [{ model: db.roles, attributes: ['name'] }] });
     const userRoles = user ? user.roles.map((role) => role.name) : [];
-    if (userRoles.includes('user') && !isRenew)
-      throw new ApiError(httpStatus.ALREADY_REPORTED, 'User with email already exists');
+    if (userRoles.includes('user') && !isRenew) {
+      const userCourses = await db.user_courses.findAll({
+        where: { userId: user.id },
+        include: [{ model: db.courses, where: { name: subscriptionNames.VIP_SIGNALS }, required: true }],
+      });
+      if (userCourses.length > 0) throw new ApiError(httpStatus.ALREADY_REPORTED, 'User with email already exists');
+    }
   }
 
   const transactionId = nanoid();
