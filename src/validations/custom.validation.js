@@ -17,10 +17,6 @@ const password = (value, helpers) => {
 
 const tags = (value) => {
   const newValue = value.replace(/^,/g, '').replace(/,$/g, '').toLowerCase();
-  // const tagsLength = newValue.split(',').length;
-  // if (tagsLength < 3) {
-  //   return helpers.message(`tags must be at least 3, ${tagsLength} found`);
-  // }
   return newValue;
 };
 
