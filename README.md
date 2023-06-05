@@ -93,6 +93,7 @@ SMTP_USERNAME=email-server-username
 SMTP_PASSWORD=email-server-password
 EMAIL_FROM=support@yourapp.com
 ```
+Check the `.env.example` for more environment variables to be used to define your own `.env`
 
 ## Project Structure
 
