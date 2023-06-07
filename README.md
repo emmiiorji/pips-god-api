@@ -69,7 +69,7 @@ This is an online learning platform for users interested in learning FOREX tradi
 
 ## 🚀 Live Demo <a name="live-demo"></a>
 
-- [Live Demo Link]([https://google.com](https://pips-god-api.onrender.com))
+- [Live Demo Link](https://pips-god-api.onrender.com)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
