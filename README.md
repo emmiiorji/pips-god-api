@@ -10,12 +10,22 @@
     - [Key Features](#key-features)
   - [🚀 Live Demo](#live-demo)
 - [💻 Getting Started](#getting-started)
-  - [Setup](#setup)
   - [Prerequisites](#prerequisites)
+  - [Setup](#setup)
   - [Install](#install)
   - [Usage](#usage)
   - [Testing](#testing)
   - [Deployment](#deployment)
+- [Project Structure](#project-structure)
+- [API Documentation](#api-documentation)
+  - [API Endpoints](#api-endpoints)
+- [Error Handling](#error-handling)
+- [Validation](#validation)
+- [Authentication](#authorization)
+- [Authorization](#authorization)
+- [Logging](#logging)
+- [Docker](#docker)
+- [Linting](#linting)
 - [👥 Authors](#authors)
 - [🔭 Future Features](#future-features)
 - [🤝 Contributing](#contributing)
@@ -79,9 +89,9 @@ This is an online learning platform for users interested in learning FOREX tradi
 
 To get a local copy up and running, follow these steps.
 
-### Prerequisites
+### Prerequisites <a name="prerequisites"></a>
 
-#### Environment Variables
+#### Environment Variables <a name="environment-variables"></a>
 
 The environment variables can be found and modified in the `.env` file. They come with these default values:
 
@@ -118,7 +128,7 @@ EMAIL_FROM=support@yourapp.com
 ```
 Check the `.env.example` for more environment variables to be used to define your own `.env`
 
-### Setup
+### Setup <a name="setup"></a>
 
 Clone this repository to your desired folder:
 
@@ -127,7 +137,7 @@ Clone this repository to your desired folder:
   git clone git@github.com:emmiiorji/pips-god-api.git
 ```
 
-### Install
+### Install <a name="install"></a>
 
 Install this project with:
 
@@ -136,7 +146,7 @@ Install this project with:
   yarn install
 ```
 
-### Usage
+### Usage <a name="usage"></a>
 
 In order to run this project in development:
 
@@ -162,7 +172,7 @@ yarn test:watch
 yarn coverage
 ```
 
-### Deployment
+### Deployment <a name="deployment"></a>
 
 In order to run this project in development:
 
@@ -173,7 +183,7 @@ In order to run this project in development:
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-## Project Structure
+## Project Structure <a name="project-structure"></a>
 
 ```
 src\
@@ -192,11 +202,11 @@ src\
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## API Documentation
+## API Documentation <a name="api-documentation"></a>
 
 To view the list of available APIs and their specifications, run the server and go to `http://localhost:3000/v1/docs` in your browser. This documentation page is automatically generated using the [swagger](https://swagger.io/) definitions written as comments in the route files.
 
-### API Endpoints
+### API Endpoints <a name="api-endpoints"></a>
 
 List of available routes:
 
@@ -218,7 +228,7 @@ List of available routes:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Error Handling
+## Error Handling <a name="error-handling"></a>
 
 The app has a centralized error handling mechanism.
 
@@ -263,7 +273,7 @@ const getUser = async (userId) => {
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Validation
+## Validation <a name="validation"></a>
 
 Request data is validated using [Joi](https://joi.dev/). Check the [documentation](https://joi.dev/api/) for more details on how to write Joi validation schemas.
 
@@ -282,7 +292,7 @@ router.post('/users', validate(userValidation.createUser), userController.create
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Authentication
+## Authentication <a name="authentication"></a>
 
 To require authentication for certain routes, you can use the `auth` middleware.
 
@@ -312,7 +322,7 @@ A refresh token is valid for 30 days. You can modify this expiration time by cha
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Authorization
+## Authorization <a name="authorization"></a>
 
 The `auth` middleware can also be used to require certain rights/permissions to access a route.
 
@@ -334,7 +344,7 @@ If the user making the request does not have the required permissions to access 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Logging
+## Logging <a name="logging"></a>
 
 Import the logger from `src/config/logger.js`. It is using the [Winston](https://github.com/winstonjs/winston) logging library.
 
@@ -361,76 +371,8 @@ Note: API request information (request url, response code, timestamp, etc.) are 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Custom Mongoose Plugins
 
-The app also contains 2 custom mongoose plugins that you can attach to any mongoose model schema. You can find the plugins in `src/models/plugins`.
-
-```javascript
-const mongoose = require('mongoose');
-const { toJSON, paginate } = require('./plugins');
-
-const userSchema = mongoose.Schema(
-  {
-    /* schema definition here */
-  },
-  { timestamps: true }
-);
-
-userSchema.plugin(toJSON);
-userSchema.plugin(paginate);
-
-const User = mongoose.model('User', userSchema);
-```
-
-### toJSON
-
-The toJSON plugin applies the following changes in the toJSON transform call:
-
-- removes \_\_v, createdAt, updatedAt, and any schema path that has private: true
-- replaces \_id with id
-
-### paginate
-
-The paginate plugin adds the `paginate` static method to the mongoose schema.
-
-Adding this plugin to the `User` model schema will allow you to do the following:
-
-```javascript
-const queryUsers = async (filter, options) => {
-  const users = await User.paginate(filter, options);
-  return users;
-};
-```
-
-The `filter` param is a regular mongo filter.
-
-The `options` param can have the following (optional) fields:
-
-```javascript
-const options = {
-  sortBy: 'name:desc', // sort order
-  limit: 5, // maximum results per page
-  page: 2, // page number
-};
-```
-
-The plugin also supports sorting by multiple criteria (separated by a comma): `sortBy: name:desc,role:asc`
-
-The `paginate` method returns a Promise, which fulfills with an object having the following properties:
-
-```json
-{
-  "results": [],
-  "page": 2,
-  "limit": 5,
-  "totalPages": 10,
-  "totalResults": 48
-}
-```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-## Docker
+## Docker <a name="docker"></a>
 
 ```bash
 # run docker container in development mode
@@ -445,7 +387,7 @@ yarn docker:test
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Linting
+## Linting <a name="linting"></a>
 
 ```bash
 # run ESLint
@@ -472,11 +414,6 @@ To prevent a certain file or directory from being linted, add it to `.eslintigno
 To maintain a consistent coding style across different IDEs, the project contains `.editorconfig`
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-
-
 
 
 <!-- AUTHORS -->
