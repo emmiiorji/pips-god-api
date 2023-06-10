@@ -26,7 +26,7 @@
 - [📝 Logging](#logging)
 - [🐳 Docker](#docker)
 - [🔍 Linting](#linting)
-- [👥 Authors](#authors)
+- [👥 Author(s)](#authors)
 - [🔭 Future Features](#future-features)
 - [🤝 Contributing](#contributing)
 - [⭐️ Show your support](#support)
