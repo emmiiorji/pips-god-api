@@ -28,7 +28,8 @@ module.exports = router;
  * @swagger
  * /auth/register:
  *   post:
- *     summary: Register as user
+ *     summary: Register a users of with role admin or user.
+ *     description: This endpoint registers both users and admins but forbids registering super admins. Super admins are created behind the scene using environment variables. To create a admin user, super admin username and password are required. To create a user, transactionAccessCode is required as payment is compulsory before joining the platform.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -41,16 +42,15 @@ module.exports = router;
  *               - lastName
  *               - email
  *               - password
- *               - phone
- *               - transactionAccessCode
- *               - address
  *             properties:
- *               name:
+ *               firstName:
+ *                 type: string
+ *               lastName:
  *                 type: string
  *               email:
  *                 type: string
  *                 format: email
- *                 description: must be unique
+ *                 description: Must be unique. Same email can be registered as both admin and user.
  *               password:
  *                 type: string
  *                 format: password
@@ -59,6 +59,21 @@ module.exports = router;
  *               phone:
  *                 type: string
  *                 description: User's phone number
+ *               address:
+ *                 type: string
+ *                 description: User's address
+ *               transactionAccessCode:
+ *                 type: string
+ *                 description: Transaction access code for payment. Required for users only.
+ *               role:
+ *                 type: string
+ *                 description: Role. Only required for admins. Defaults to user.
+ *               superAdminUsername:
+ *                 type: string
+ *                 description: Username of a registered super admin. Required for admin account creation only.
+ *               superAdminPassword:
+ *                 type: string
+ *                 description: Password of corresponding super admin with provided username. Required for admin account creation only.
  *             example:
  *                   email: example@email.com
  *                   password: password123
