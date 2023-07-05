@@ -1,63 +1,97 @@
-# PIPS GOD API
+<a name="readme-top"></a>
 
+<!-- TABLE OF CONTENTS -->
 
-## Commands
+# 📗 Table of Contents
 
-Running locally:
+- [📖 About the Project](#about-project)
+  - [🛠 Built With](#built-with)
+    - [Tech Stack](#tech-stack)
+    - [Key Features](#key-features)
+  - [🚀 Live Demo](#live-demo)
+- [💻 Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Setup](#setup)
+  - [Install](#install)
+  - [Usage](#usage)
+  - [Testing](#testing)
+  - [Deployment](#deployment)
+- [📁 Project Structure](#project-structure)
+- [📚 API Documentation](#api-documentation)
+  - [🔗 API Endpoints](#api-endpoints)
+- [⚠️ Error Handling](#error-handling)
+- [✅ Validation](#validation)
+- [🔒 Authentication](#authorization)
+- [🔑 Authorization](#authorization)
+- [📝 Logging](#logging)
+- [🐳 Docker](#docker)
+- [🔍 Linting](#linting)
+- [👥 Author(s)](#authors)
+- [🔭 Future Features](#future-features)
+- [🤝 Contributing](#contributing)
+- [⭐️ Show your support](#support)
+- [🙏 Acknowledgements](#acknowledgements)
+- [❓ FAQ](#faq)
+- [📝 License](#license)
 
-```bash
-yarn dev
-```
+<!-- PROJECT DESCRIPTION -->
 
-Running in production:
+# 📖 Pips god API <a name="about-project"></a>
 
-```bash
-yarn start
-```
+This is an online learning platform for users interested in learning FOREX trading, This website is built with comprehensive courses from the basics of FOREX market to advanced trading strategies. This is the server side repo while the client side repo can be found <a href="https://github.com/vickymarz/pips-god">here</a>👈.
 
-Testing:
+## 🛠 Built With <a name="built-with"></a>
 
-```bash
-# run all tests
-yarn test
+### Tech Stack <a name="tech-stack"></a>
 
-# run all tests in watch mode
-yarn test:watch
+<details>
+  <summary>Client</summary>
+  <ul>
+    <li><a href="https://reactjs.org/">React.js</a></li>
+  </ul>
+</details>
 
-# run test coverage
-yarn coverage
-```
+<details>
+  <summary>Server</summary>
+  <ul>
+    <li><a href="https://expressjs.com/">Express.js</a></li>
+  </ul>
+</details>
 
-Docker:
+<details>
+<summary>Database</summary>
+  <ul>
+    <li><a href="https://dev.mysql.com/">MySQL</a></li>
+  </ul>
+</details>
 
-```bash
-# run docker container in development mode
-yarn docker:dev
+<!-- Features -->
 
-# run docker container in production mode
-yarn docker:prod
+### Key Features <a name="key-features"></a>
 
-# run all tests in a docker container
-yarn docker:test
-```
+- User Authorization and Authentication
+- Payment platform
+- Courses Learning Administration
 
-Linting:
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-```bash
-# run ESLint
-yarn lint
+<!-- LIVE DEMO -->
 
-# fix ESLint errors
-yarn lint:fix
+## 🚀 Live Demo <a name="live-demo"></a>
 
-# run prettier
-yarn prettier
+- [Live Demo Link](https://pips-god-api.onrender.com)
 
-# fix prettier errors
-yarn prettier:fix
-```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Environment Variables
+<!-- GETTING STARTED -->
+
+## 💻 Getting Started <a name="getting-started"></a>
+
+To get a local copy up and running, follow these steps.
+
+### Prerequisites <a name="prerequisites"></a>
+
+#### Environment Variables <a name="environment-variables"></a>
 
 The environment variables can be found and modified in the `.env` file. They come with these default values:
 
@@ -67,8 +101,7 @@ PORT=3000
 
 # Database Property
 
-# URL of the Mongo DB
-MONGODB_URL=mongodb://127.0.0.1:27017/node-boilerplate
+# URL of the DB
 DB_URL=mysql://user:password@localhost:3306/sample
 DB_HOST=localhost
 DB_NAME=sample
@@ -95,7 +128,62 @@ EMAIL_FROM=support@yourapp.com
 ```
 Check the `.env.example` for more environment variables to be used to define your own `.env`
 
-## Project Structure
+### Setup <a name="setup"></a>
+
+Clone this repository to your desired folder:
+
+```sh
+  cd my-folder
+  git clone git@github.com:emmiiorji/pips-god-api.git
+```
+
+### Install <a name="install"></a>
+
+Install this project with:
+
+```sh
+  cd pips-god-api
+  yarn install
+```
+
+### Usage <a name="usage"></a>
+
+In order to run this project in development:
+
+```sh
+ yarn dev
+```
+In order to run it in production:
+
+```sh
+ yarn start
+```
+
+### Testing <a name="testing"></a>
+
+```bash
+# run all tests
+yarn test
+
+# run all tests in watch mode
+yarn test:watch
+
+# run test coverage
+yarn coverage
+```
+
+### Deployment <a name="deployment"></a>
+
+In order to run this project in development:
+
+```sh
+ yarn dev
+```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+## Project Structure <a name="project-structure"></a>
 
 ```
 src\
@@ -112,11 +200,13 @@ src\
  |--index.js        # App entry point
 ```
 
-## API Documentation
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## API Documentation <a name="api-documentation"></a>
 
 To view the list of available APIs and their specifications, run the server and go to `http://localhost:3000/v1/docs` in your browser. This documentation page is automatically generated using the [swagger](https://swagger.io/) definitions written as comments in the route files.
 
-### API Endpoints
+### API Endpoints <a name="api-endpoints"></a>
 
 List of available routes:
 
@@ -136,7 +226,9 @@ List of available routes:
 `PATCH /v1/users/:userId` - update user\
 `DELETE /v1/users/:userId` - delete user
 
-## Error Handling
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Error Handling <a name="error-handling"></a>
 
 The app has a centralized error handling mechanism.
 
@@ -179,7 +271,9 @@ const getUser = async (userId) => {
 };
 ```
 
-## Validation
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Validation <a name="validation"></a>
 
 Request data is validated using [Joi](https://joi.dev/). Check the [documentation](https://joi.dev/api/) for more details on how to write Joi validation schemas.
 
@@ -196,7 +290,9 @@ const router = express.Router();
 router.post('/users', validate(userValidation.createUser), userController.createUser);
 ```
 
-## Authentication
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Authentication <a name="authentication"></a>
 
 To require authentication for certain routes, you can use the `auth` middleware.
 
@@ -224,7 +320,9 @@ After the access token expires, a new access token can be generated, by making a
 
 A refresh token is valid for 30 days. You can modify this expiration time by changing the `JWT_REFRESH_EXPIRATION_DAYS` environment variable in the .env file.
 
-## Authorization
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Authorization <a name="authorization"></a>
 
 The `auth` middleware can also be used to require certain rights/permissions to access a route.
 
@@ -244,7 +342,9 @@ The permissions are role-based. You can view the permissions/rights of each role
 
 If the user making the request does not have the required permissions to access this route, a Forbidden (403) error is thrown.
 
-## Logging
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Logging <a name="logging"></a>
 
 Import the logger from `src/config/logger.js`. It is using the [Winston](https://github.com/winstonjs/winston) logging library.
 
@@ -269,74 +369,39 @@ This app uses pm2 in production mode, which is already configured to store the l
 
 Note: API request information (request url, response code, timestamp, etc.) are also automatically logged (using [morgan](https://github.com/expressjs/morgan)).
 
-## Custom Mongoose Plugins
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-The app also contains 2 custom mongoose plugins that you can attach to any mongoose model schema. You can find the plugins in `src/models/plugins`.
 
-```javascript
-const mongoose = require('mongoose');
-const { toJSON, paginate } = require('./plugins');
+## Docker <a name="docker"></a>
 
-const userSchema = mongoose.Schema(
-  {
-    /* schema definition here */
-  },
-  { timestamps: true }
-);
+```bash
+# run docker container in development mode
+yarn docker:dev
 
-userSchema.plugin(toJSON);
-userSchema.plugin(paginate);
+# run docker container in production mode
+yarn docker:prod
 
-const User = mongoose.model('User', userSchema);
+# run all tests in a docker container
+yarn docker:test
 ```
 
-### toJSON
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-The toJSON plugin applies the following changes in the toJSON transform call:
+## Linting <a name="linting"></a>
 
-- removes \_\_v, createdAt, updatedAt, and any schema path that has private: true
-- replaces \_id with id
+```bash
+# run ESLint
+yarn lint
 
-### paginate
+# fix ESLint errors
+yarn lint:fix
 
-The paginate plugin adds the `paginate` static method to the mongoose schema.
+# run prettier
+yarn prettier
 
-Adding this plugin to the `User` model schema will allow you to do the following:
-
-```javascript
-const queryUsers = async (filter, options) => {
-  const users = await User.paginate(filter, options);
-  return users;
-};
+# fix prettier errors
+yarn prettier:fix
 ```
-
-The `filter` param is a regular mongo filter.
-
-The `options` param can have the following (optional) fields:
-
-```javascript
-const options = {
-  sortBy: 'name:desc', // sort order
-  limit: 5, // maximum results per page
-  page: 2, // page number
-};
-```
-
-The plugin also supports sorting by multiple criteria (separated by a comma): `sortBy: name:desc,role:asc`
-
-The `paginate` method returns a Promise, which fulfills with an object having the following properties:
-
-```json
-{
-  "results": [],
-  "page": 2,
-  "limit": 5,
-  "totalPages": 10,
-  "totalResults": 48
-}
-```
-
-## Linting
 
 Linting is done using [ESLint](https://eslint.org/) and [Prettier](https://prettier.io).
 
@@ -348,16 +413,98 @@ To prevent a certain file or directory from being linted, add it to `.eslintigno
 
 To maintain a consistent coding style across different IDEs, the project contains `.editorconfig`
 
-## Contributing
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-Contributions are more than welcome! Please check out the [contributing guide](CONTRIBUTING.md).
+
+<!-- AUTHORS -->
+
+## 👥 Author <a name="authors"></a>
+
+👤 **Emmanuel Orji-Ihuoma**
+
+- GitHub: [@emmiiorji](https://github.com/emmiiorji)
+- Twitter: [@emmiiorji](https://twitter.com/emmiiorji)
+- LinkedIn: [LinkedIn](https://linkedin.com/in/orji-emmanuel)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- FUTURE FEATURES -->
+
+## 🔭 Future Features <a name="future-features"></a>
+
+> Describe 1 - 3 features you will add to the project.
+
+- User Authorization and Authentication
+- Payment platform
+- Courses Learning Administration
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- CONTRIBUTING -->
+
+## 🤝 Contributing <a name="contributing"></a>
+
+Contributions, issues, and feature requests are welcome!
+
+Feel free to check the [issues page](../../issues/).
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- SUPPORT -->
+
+## ⭐️ Show your support <a name="support"></a>
+
+> Write a message to encourage readers to support your project
+
+If you like this project...
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- ACKNOWLEDGEMENTS -->
+
+## 🙏 Acknowledgments <a name="acknowledgements"></a>
+
+I would like to thank <a href="https://github.com/vickymarz">Okoroji Victor</a> for building the frontend of the application
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- INSPIRATIONS -->
 
 ## Inspirations
 
 - [danielfsousa/express-rest-es2017-boilerplate](https://github.com/danielfsousa/express-rest-es2017-boilerplate)
-- [madhums/node-express-mongoose](https://github.com/madhums/node-express-mongoose)
-- [kunalkapadia/express-mongoose-es6-rest-api](https://github.com/kunalkapadia/express-mongoose-es6-rest-api)
 
-## License
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-[MIT](LICENSE)
+<!-- FAQ (optional) -->
+
+## ❓ FAQ <a name="faq"></a>
+
+- Is the application hosted?
+
+  - Yes, both the server side (this repo) and client side are hosted in development mode <a href="https://pips-god-api.onrender.com">here</a> and <a href="https://pipsgod.netlify.app/">here</a> ...respectively
+
+- How many subscription plans are there?
+
+  - There are currently two plans under which one can register. One is VIP mentorship for which you'll be added to a closed Telegram group for mentorship programs. The other is Training and Mentorship plan where you'll have access to resources to aid your learning.
+
+- What happens if I provided a different payment when subscribing on the platform and use a different one when signing up?
+
+  - The email provided during signup is the one to be saved against your profile
+ 
+- For how long is the subscription valid?
+
+  - They're valid for 30days
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+
+<!-- LICENSE -->
+
+## 📝 License <a name="license"></a>
+
+This project is [MIT](./LICENSE) licensed.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
