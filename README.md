@@ -36,7 +36,7 @@
 
 <!-- PROJECT DESCRIPTION -->
 
-# 📖 Pips god API <a name="about-project"></a>
+# 📖 Forex Academy API <a name="about-project"></a>
 
 This is an online learning platform for users interested in learning FOREX trading, This website is built with comprehensive courses from the basics of FOREX market to advanced trading strategies. This is the server side repo while the client side repo can be found <a href="https://github.com/vickymarz/pips-god">here</a>👈.
 
