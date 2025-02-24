@@ -11,6 +11,7 @@ const morgan = require('./config/morgan');
 const { jwtStrategy } = require('./config/passport');
 const { authLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes/v1');
+const rootRoute = require('./routes/v1/root');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 const { db } = require('./models');
@@ -21,6 +22,7 @@ const {
   createPermissions,
   createSeedCourses,
 } = require('./utils/mockData');
+const corsOptions = require('./config/corsOptions');
 
 const app = express();
 
@@ -46,8 +48,8 @@ app.use(mongoSanitize());
 app.use(compression());
 
 // enable cors
-app.use(cors());
-app.options('*', cors());
+app.use(cors(corsOptions));
+// app.options('*', cors());
 
 // jwt authentication
 app.use(passport.initialize());
@@ -57,6 +59,8 @@ passport.use('jwt', jwtStrategy);
 if (config.env === 'production') {
   app.use('/v1/auth', authLimiter);
 }
+
+app.use('^/$|/index(.html)?', rootRoute);
 
 // v1 api routes
 app.use('/v1', routes);
